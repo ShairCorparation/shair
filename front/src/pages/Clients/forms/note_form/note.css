@@ -1,0 +1,5 @@
+.note_field_client, .client_note_dialog > div.MuiDialog-container.MuiDialog-scrollPaper.css-hz1bth-MuiDialog-container > div, form {
+    width: -webkit-fill-available !important;
+}
+
+

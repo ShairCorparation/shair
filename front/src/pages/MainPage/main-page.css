@@ -1,0 +1,41 @@
+.box_panel_navigation {
+    background: #020202d4 !important;
+}
+
+.box_panel_navigation > button {
+    color: #bbbbbb;
+    transition: .3s;
+}
+
+.box_panel_navigation > button.Mui-selected {
+    color: white;
+    box-shadow: 0px 4px 15px 2px white;
+}
+
+.active_requests > svg {
+    fill: rgb(0, 225, 255) !important;
+}
+
+.active_orders > svg {
+    fill: rgb(68, 255, 0) !important;
+}
+
+.active_clients > svg {
+    fill: rgb(255, 174, 0) !important;
+}
+
+.active_carriers > svg {
+    fill: rgb(246, 255, 0) !important;
+}
+
+.active_reports > svg {
+    fill: rgb(255, 42, 0) !important;
+}
+
+.active_profile > svg {
+    fill: rgb(255, 255, 255) !important;
+}
+
+.main_container {
+    overflow: auto !important;
+}

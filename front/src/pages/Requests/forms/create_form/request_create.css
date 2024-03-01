@@ -1,0 +1,32 @@
+.date_picker {
+    width: -webkit-fill-available;
+}
+
+.date_picker > div > input {
+    padding: 9px;
+}
+
+.date_picker > label {
+    top: -5px !important;
+}
+
+.card_action {
+    border-top: 1px solid #8080804d;
+}
+
+.edit_request {
+    width: 100%;
+}
+
+.form_create {
+    width: 100%;
+}
+
+.dialog_content {
+    display: flex;
+    justify-content: center;
+}
+
+.dialog_container > div:nth-child(3) > div:first-child {
+    min-width: fit-content !important;
+}

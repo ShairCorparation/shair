@@ -1,0 +1,359 @@
+import {
+    Grid, Card, CardContent, CardActions, CardHeader, Button, FormControl, InputLabel, Select,
+    MenuItem, TextField, Paper, Typography, IconButton, Box
+} from '@mui/material'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import CircularProgress from '@mui/material/CircularProgress';
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ruRU } from '@mui/x-date-pickers/locales';
+import { useForm, Controller } from 'react-hook-form'
+import CreateClient from '../create_client/CreateClient';
+import { useState, useEffect } from 'react'
+import { api } from '../../../../api/api';
+import FormError from '../../../../components/FormError/FormError';
+import './request_create.css'
+
+
+export default function RequestCreate() {
+    const { register, control, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
+    const [clients, setClients] = useState(null)
+    const [open, setOpen] = useState(false);
+
+    const handleSave = (form_date) => {
+        api(`/api/requests/`, 'POST', form_date)
+            .then((res) => {
+                window.location.href = '/'
+            })
+            .catch((err) => {
+            })
+    }
+
+    useEffect(() => {
+        api('/api/clients/', 'GET').then((res) => {
+            setClients(res.data)
+        })
+
+    }, [])
+
+
+    return (
+        <Grid container p={0} justifyContent='center' alignItems='baseline' >
+            <Card sx={{ width: '90%', marginTop: '50px' }} elevation={10}>
+                <form onSubmit={handleSubmit(handleSave)} className='form_create'>
+                    <CardHeader title='Создание нового запроса' align='center' sx={{ marginTop: '20px' }} />
+
+                    <CardContent>
+                        <Grid container justifyContent='center'>
+                            <Grid container item md={5.5} m={1}>
+                                <Grid container item xs={12} component={Paper}>
+                                    <Grid item xs={12} pl={2} pt={1}>
+                                        <Typography variant='body1'>Общая информация</Typography>
+                                    </Grid>
+                                    <Grid container item xs={12} md={6} p={1}>
+                                        <Grid item xs={10}>
+                                            <FormControl sx={{ width: '100%' }} size='small'>
+                                                <InputLabel id="demo-simple-select-label">Клиент</InputLabel>
+                                                <Select
+                                                    labelId="demo-simple-select-label"
+                                                    id="demo-simple-select"
+                                                    label="Клиент"
+                                                    {...register('client', { required: true })}
+                                                >
+                                                    {clients && clients.map((client) => (
+                                                        <MenuItem value={client.id}>{client.company_name}</MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                            <FormError error={errors?.client} />
+                                        </Grid>
+                                        <Grid item xs={2} align='end'>
+                                            <IconButton aria-label="delete" size="25px" align='end'
+                                                onClick={() => setOpen(true)}>
+                                                <AddCircleRoundedIcon color='success' fontSize="inherit" />
+                                            </IconButton>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Наименование"
+                                            placeholder="Наименование"
+                                            {...register('name_of_cargo', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.name_of_cargo} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Тип транспорта"
+                                            placeholder="Тип транспорта"
+                                            {...register('type_of_transport', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.type_of_transport} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="number" size='small'
+                                            fullWidth
+                                            label="Цена заказчика"
+                                            placeholder="Цена заказчика"
+                                            {...register('customer_price', {
+                                                required: true,
+                                                valueAsNumber: true
+                                            })}
+                                        />
+                                        <FormError error={errors?.customer_price} />
+                                    </Grid>
+
+                                    <Grid item xs={12} p={1}>
+                                        <FormControl sx={{ width: '100%' }} size="small">
+                                            <InputLabel id="demo-simple-select-label">Валюта</InputLabel>
+                                            <Select
+
+                                                className="select_field_edit_page"
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                label="Валюта"
+                                                {...register('currency', { required: true })}
+                                            >
+                                                <MenuItem value={'USD'}>USD</MenuItem>
+                                                <MenuItem value={'EUR'}>EUR</MenuItem>
+                                                <MenuItem value={'BYN'}>BYN</MenuItem>
+                                                <MenuItem value={'RUB'}>RUB</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormError error={errors?.currency} />
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item xs={12} mt={2} component={Paper}>
+                                    <Grid item xs={12} pl={2} pt={1}>
+                                        <Typography variant='body1'>Информация о грузе</Typography>
+                                    </Grid>
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Вес"
+                                            placeholder="Вес"
+                                            {...register('weight', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.weight} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Палеты"
+                                            placeholder="Палеты"
+                                            {...register('pallets', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.pallets} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Длина"
+                                            placeholder="Длина"
+                                            {...register('yardage', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.yardage} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Ширина"
+                                            placeholder="Ширина"
+                                            {...register('width', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.width} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Высота"
+                                            placeholder="Высота"
+                                            {...register('height', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.height} />
+                                    </Grid>
+
+                                    <Grid item xs={12} md={6} p={1}>
+                                        <TextField type="text" size='small'
+                                            fullWidth
+                                            label="Объем"
+                                            placeholder="Объем"
+                                            {...register('volume', {
+                                                required: true,
+                                            })}
+                                        />
+                                        <FormError error={errors?.volume} />
+                                    </Grid>
+
+                                    <Grid item xs={12} p={1}>
+                                        <TextField type="text" size='small' multiline minRows='5'
+                                            fullWidth
+                                            label="Дополнительная информация"
+                                            placeholder="Дополнительная информация"
+                                            {...register('note',)}
+                                        />
+                                        <FormError error={errors?.note} />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item xs={12} md={5.5} m={1} component={Paper} alignContent='baseline'>
+                                <Grid item xs={12} pl={2} pt={1}>
+                                    <Typography variant='body1'>Информация о доставке</Typography>
+                                </Grid>
+                                <Grid item xs={12} md={6} p={1}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}
+                                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
+                                        <Controller
+                                            name="date_of_shipment"
+                                            control={control}
+                                            rules={{
+                                                required: true,
+                                            }}
+                                            defaultValue={null}
+                                            render={({ field }) => (
+                                                <DatePicker
+                                                    className='date_picker'
+                                                    label="Дата загрузки"
+                                                    value={field.value}
+                                                    onChange={(value) => field.onChange(value.format('YYYY-MM-DD'))}
+                                                />
+                                            )} />
+                                    </LocalizationProvider>
+                                    <FormError error={errors?.date_of_shipment} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}
+                                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
+                                    >
+                                        <Controller
+                                            name="date_of_delivery"
+                                            control={control}
+                                            rules={{
+                                                required: true,
+                                            }}
+                                            defaultValue={null}
+                                            render={({ field }) => (
+                                                <DatePicker
+                                                    localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
+                                                    className='date_picker'
+                                                    label="Дата доставки"
+                                                    value={field.value}
+                                                    onChange={(value) => field.onChange(value.format('YYYY-MM-DD'))}
+                                                />
+                                            )} />
+                                    </LocalizationProvider>
+                                    <FormError error={errors?.date_of_delivery} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Страна отгрузки"
+                                        placeholder="Страна отгрузки"
+                                        {...register('country_of_dispatch', { required: true })}
+                                    />
+                                    <FormError error={errors?.country_of_dispatch} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Страна доставки"
+                                        placeholder="Страна доставки"
+                                        {...register('delivery_country', { required: true })}
+                                    />
+                                    <FormError error={errors?.delivery_country} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Город отгрузки"
+                                        placeholder="Город отгрузки"
+                                        {...register('city_of_dispatch', { required: true })}
+                                    />
+                                    <FormError error={errors?.city_of_dispatch} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Город доставки"
+                                        placeholder="Город доставки"
+                                        {...register('delivery_city', { required: true })}
+                                    />
+                                    <FormError error={errors?.delivery_city} />
+                                </Grid>
+
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Адрес отгрузки"
+                                        placeholder="Адрес отгрузки"
+                                        {...register('address_of_dispatch', {
+                                            required: true,
+                                        })}
+                                    />
+                                    <FormError error={errors?.address_of_dispatch} />
+                                </Grid>
+
+                                <Grid item xs={12} md={6} p={1}>
+                                    <TextField type="text" size='small'
+                                        fullWidth
+                                        label="Адрес доставки"
+                                        placeholder="Адрес доставки"
+                                        {...register('delivery_address', {
+                                            required: true,
+                                        })}
+                                    />
+                                    <FormError error={errors?.delivery_address} />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+
+                    <CardActions align='center' className='card_action'>
+                        <Grid container p={1} justifyContent='flex-end'>
+                            <Grid item xs={6} md={2} align='end' p={1}>
+                                <Button variant='outlined' onClick={() => reset()} color='error'>Очистить</Button>
+                            </Grid>
+
+                            <Grid item xs={6} md={2} align='start' p={1}>
+                                <Button variant='outlined' color='success' type='submit'>Создать</Button>
+                            </Grid>
+                        </Grid>
+                    </CardActions>
+                </form>
+                <CreateClient setOpen={setOpen} open={open} setClients={setClients} />
+            </Card>
+        </Grid>
+    )
+}

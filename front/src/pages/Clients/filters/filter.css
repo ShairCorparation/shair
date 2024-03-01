@@ -1,0 +1,30 @@
+.input_container, .input_date_container {
+    display: flex;
+    background: #80808029;
+    border-radius: 10px;
+}
+
+.input_container > div > div > input, .input_container > div:nth-child(4) > div > div > input {
+    background: white !important;
+    font-size: 12px;
+    width: 150px;
+}
+
+.selector_container {
+    display: flex;
+}
+
+.selector_container > span {
+    margin-top: 15px;
+    margin-left: 3px;
+}
+
+.input_container > span, .input_date_container > span {
+    margin: 3px;
+}
+
+.input_date_container > div > div > input, .input_date_container > div {
+    width: fit-content !important;
+    background: white !important;
+}
+

@@ -1,0 +1,185 @@
+import * as React from 'react'
+import { Grid, IconButton, TextField, Button, FormControl, Select, MenuItem } from '@mui/material'
+import CancelIcon from '@mui/icons-material/Cancel';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ruRU } from '@mui/x-date-pickers/locales';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import '../../Clients/filters/filter.css'
+import { api } from '../../../api/api';
+
+
+export default function OvercomesFilter({ setFilterData, filterData, setSendFilter, sendFilter, initial_data, setSelector, selector }) {
+
+    const [users, setUser] = React.useState(null)
+
+    React.useEffect(()=> {
+        api('/auth/users_info/').then((res) => {
+            setUser(res.data)
+        })
+    }, [])
+
+    return (
+        <Grid container item xs={12} p={1}>
+            <Grid container item xs={12} spacing={1} p={1}>
+                <Grid item className='selector_container' xs={2} md={1.2} lg={1.6} xl={1.5}>
+                    <span>Группировать: </span>
+                </Grid>
+
+                <Grid item>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <Select
+                            id="demo-select-small"
+                            value={selector}
+                            onChange={(v) => setSelector(v.target.value)}
+                        >
+                            <MenuItem value={'manager'}>по менеджеру</MenuItem>
+                            <MenuItem value={'client'}>по клиенту</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid>
+
+            </Grid>
+            <Grid container item xs={12} spacing={1} p={1}>
+                <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
+                    <IconButton aria-label="delete"
+                        onClick={() => {
+                            setFilterData({ ...filterData, request_id: '', company_name: '', executor: ''})
+                            setSendFilter(!sendFilter)
+                        }}
+                    >
+                        <CancelIcon />
+                    </IconButton>
+                    ID:
+                </Grid>
+
+                <Grid item alignItems='center' className='input_container' justifyContent='center' p={1} ml={1}>
+                    <span>Нр заказа: </span>
+                    <TextField id="outlined-basic" variant="outlined" size='small'
+                        value={filterData.request_id}
+                        onChange={(e) => setFilterData({ ...filterData, request_id: e.target.value })}
+                    />
+                </Grid>
+
+                {selector === 'client' &&
+                    <Grid item alignItems='center' className='input_container' justifyContent='center' p={1} ml={1}>
+                        <span>Компания: </span>
+                        <TextField id="outlined-basic" variant="outlined" size='small'
+                            value={filterData.company_name}
+                            onChange={(e) => setFilterData({ ...filterData, company_name: e.target.value })}
+                        />
+                    </Grid>
+                }
+
+                {selector === 'manager' &&
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <Select
+                            id="demo-select-small"
+                            value={filterData.executor}
+                            onChange={(e) => setFilterData({ ...filterData, executor: e.target.value })}
+                        >
+                            <MenuItem value={0}>Выберете менеджера</MenuItem>
+                            {users?.map((user) => (
+                                <MenuItem value={user?.id}>{user?.first_name} {user?.last_name}</MenuItem>
+                            ))}
+                            
+                        </Select>
+                    </FormControl>
+                }
+
+            </Grid>
+
+            <Grid container item xs={12} spacing={1} p={1}>
+                <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
+                    <IconButton aria-label="delete"
+                        onClick={() => {
+                            setFilterData({ ...filterData, duration_country_from: '', duration_city_from: '', duration_country_up: '', duration_city_up: '' })
+                            setSendFilter(!sendFilter)
+                        }}
+                    >
+                        <CancelIcon />
+                    </IconButton>
+                    Направления:
+                </Grid>
+
+                <Grid item alignItems='center' className='input_container' justifyContent='center' p={1} ml={1}>
+                    <span>Направление Из: </span>
+                    <TextField label='Страна' id="outlined-basic" variant="outlined" size='small'
+                        value={filterData.duration_country_from}
+                        onChange={(e) => setFilterData({ ...filterData, duration_country_from: e.target.value })}
+                    />
+                    <span> </span>
+                    <TextField label='Город' id="outlined-basic" variant="outlined" size='small'
+                        value={filterData.duration_city_from}
+                        onChange={(e) => setFilterData({ ...filterData, duration_city_from: e.target.value })}
+                    />
+                </Grid>
+
+                <Grid item alignItems='center' className='input_container' justifyContent='center' p={1} ml={1}>
+                    <span>В: </span>
+                    <TextField label='Страна' id="outlined-basic" variant="outlined" size='small'
+                        value={filterData.duration_country_up}
+                        onChange={(e) => setFilterData({ ...filterData, duration_country_up: e.target.value })}
+                    />
+                    <span> </span>
+                    <TextField label='Город' id="outlined-basic" variant="outlined" size='small'
+                        value={filterData.duration_city_up}
+                        onChange={(e) => setFilterData({ ...filterData, duration_city_up: e.target.value })}
+                    />
+                </Grid>
+            </Grid>
+
+            <Grid container item xs={12} spacing={1} p={1}>
+                <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
+                    <IconButton aria-label="delete"
+                        onClick={() => {
+                            setFilterData({ ...filterData, request_date_from: '', request_date_up: '' })
+                            setSendFilter(!sendFilter)
+                        }}
+                    >
+                        <CancelIcon />
+                    </IconButton>
+                    Даты:
+                </Grid>
+
+                <Grid item alignItems='center' className='input_date_container' justifyContent='center' p={1} ml={1}>
+                    <span>Дата запроса От: </span>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}
+                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
+                        <DatePicker
+                            value={filterData.request_date_from !== '' ? filterData.request_date_from : null}
+                            className='date_picker'
+                            onChange={(value) => setFilterData({ ...filterData, request_date_from: value.format('YYYY-MM-DD') })}
+                        />
+                    </LocalizationProvider>
+                    <span>До: </span>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}
+                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
+                        <DatePicker
+                            value={filterData.request_date_up !== '' ? filterData.request_date_up : null}
+                            className='date_picker'
+                            onChange={(value) => setFilterData({ ...filterData, request_date_up: value.format('YYYY-MM-DD') })}
+                        />
+                    </LocalizationProvider>
+                </Grid>
+
+            </Grid>
+
+            <Grid container item xs={12} spacing={1} p={1} justifyContent='flex-end'>
+                <Grid item>
+                    <Button color='error' onClick={() => {
+                        setFilterData(initial_data)
+                        setSendFilter(!sendFilter)
+                    }}
+                    >
+                        Очистить фильтр
+                    </Button>
+                </Grid>
+
+                <Grid item>
+                    <Button color='success' onClick={() => setSendFilter(!sendFilter)}>Применить фильтры</Button>
+                </Grid>
+            </Grid>
+        </Grid >
+    )
+}

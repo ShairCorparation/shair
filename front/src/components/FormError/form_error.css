@@ -1,0 +1,25 @@
+.card_error {
+    display: flex;
+    position: absolute;
+    background: white;
+    opacity: 0;
+    z-index: 2;
+    padding: 5px;
+    animation: ani 1.5s forwards;
+    width: fit-content !important;
+}
+
+@keyframes ani {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+.card_error::after {
+    opacity: 0 !important;
+}
+
+
+.card_error > p {
+    margin: auto 5px;
+    color: #bd9a68;
+}

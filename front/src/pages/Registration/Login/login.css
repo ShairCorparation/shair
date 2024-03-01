@@ -1,0 +1,17 @@
+.login_form {
+    width: -webkit-fill-available !important;
+    padding: 15px;
+}
+
+.password_field  {
+    top: -7px !important;
+}
+
+.auth_text_container {
+    background: #071007d4;
+    color: white;
+}
+
+.auth_text_container > p {
+    font-size: 18px !important;
+}

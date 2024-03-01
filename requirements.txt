@@ -1,0 +1,15 @@
+# Django and libs
+Django==4.2.3
+djangorestframework==3.14.0
+django-environ==0.10.0
+django-choices==2.0.0
+django-filter==22.1
+drf_spectacular[sidecar]==0.26.4
+django-cors-headers==4.2.0
+djangorestframework-simplejwt==5.3.0
+django-registration==3.4.0
+requests==2.31.0
+
+
+# DB
+psycopg2-binary==2.9.6
