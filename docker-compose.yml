@@ -12,7 +12,7 @@ services:
       DJANGO_SETTINGS_MODULE: project.settings.settings
     volumes:
       - ./project:/service
-    command: sh -c "python manage.py runserver"
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
 
