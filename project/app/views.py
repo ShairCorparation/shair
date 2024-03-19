@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from app.models import Carrier, Client, Request, Docs
 from app.serializers import ClientSerializer, RequestSerializer, CarrierSerializer, \
-        OrdersSerializer, DocsRequestSerializer, ClientFinesSerializer, ClientOvercomesSerializer
+        OrdersSerializer, DocsRequestSerializer, ClientFinesSerializer, ClientOvercomesSerializer, RequestListSerializer
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -84,8 +84,9 @@ class RequestViewSet(
             return Request.objects.all().order_by('date_of_request').filter(executor=self.request.user.pk)
 
     def list(self, request, *args, **kwargs):
+        currency_data = get_currencies()
         instances = self.get_queryset().filter(status='created')
-        serializer = self.serializer_class(instances, many=True)
+        serializer = RequestListSerializer(instances, many=True, context=currency_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def retrieve(self, request, *args, **kwargs):
@@ -102,6 +103,7 @@ class RequestViewSet(
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     def create(self, request, *args, **kwargs):
+        request.data['executor'] = request.user.pk
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()

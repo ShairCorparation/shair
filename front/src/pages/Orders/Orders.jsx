@@ -38,11 +38,9 @@ export default function Orders() {
     useEffect(() => {
         const loadCurrency = async (name) => {
             await axios.get(`https://api.nbrb.by/exrates/rates/${name}UR?parammode=2`).then((res) => {
-
                 name === 'EUR' && setEUR(res.data.Cur_OfficialRate)
                 name === 'USD' && setUSD(res.data.Cur_OfficialRate)
                 name === 'RUB' && setRUB(res.data.Cur_OfficialRate)
-
             })
         }
 
@@ -79,7 +77,7 @@ export default function Orders() {
         let res
         currency === 'USD' && (res = amount * USD)
         currency === 'EUR' && (res = amount * EUR)
-        currency === 'RUB' && (res = amount * RUB)
+        currency === 'RUB' && (res = amount * RUB / 100)
         return res;
       };
 

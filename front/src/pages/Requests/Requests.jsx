@@ -62,6 +62,7 @@ export default function Requests({ setAlertInfo }) {
                             <TableCell align="left">Дата загрузки</TableCell>
                             <TableCell align="left">Дата доставки</TableCell>
                             <TableCell align="left">Клиент</TableCell>
+                            <TableCell align="left">Ставка заказчика</TableCell>
                             <TableCell align="left">Ценовые предл-ия</TableCell>
                             <TableCell align="left">Действия</TableCell>
                         </TableRow>
@@ -84,6 +85,7 @@ export default function Requests({ setAlertInfo }) {
                                     <br />
                                     {req.client.contact_info}
                                 </TableCell>
+                                <TableCell align="left">{req.customer_price} BYN</TableCell>
                                 <TableCell align="left">
                                     {req.carrier_list.map((carr)=> (
                                         <React.Fragment>

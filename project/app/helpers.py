@@ -2,6 +2,7 @@ import requests
 
 def get_currencies():
     res = requests.get('https://api.nbrb.by/exrates/rates?periodicity=0')
+    
     data = {}
     for el in res.json():
         if el['Cur_Abbreviation'] == 'USD':

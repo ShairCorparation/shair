@@ -52,6 +52,29 @@ class RequestSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+
+        representation['client'] = ClientSerializer(instance.client).data
+        representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
+        return representation
+
+    class Meta:
+        model = Request
+        fields = '__all__'
+
+
+class RequestListSerializer(serializers.ModelSerializer):
+    carrier_list = serializers.SerializerMethodField()
+
+    def get_carrier_list(self, instance):
+        return CarrierSerializer(Carrier.objects.filter(request_id=instance.id), many=True).data
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if instance.currency == 'RUB':
+            representation['customer_price'] = round(instance.customer_price * self.context[instance.currency] / 100, 2)
+        else:
+            representation['customer_price'] = round(instance.customer_price * self.context[instance.currency], 2)
         representation['client'] = ClientSerializer(instance.client).data
         representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
         return representation
@@ -83,7 +106,10 @@ class ClientFinesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            converted_price = request.customer_price * self.context[request.currency]
+            if request.currency == 'RUB':
+                converted_price = request.customer_price * self.context[request.currency] / 100
+            else:
+                converted_price = request.customer_price * self.context[request.currency]   
             total_sum += converted_price
  
         return(round(total_sum, 2))
@@ -116,7 +142,10 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            converted_price = request.carrier.rate * self.context[request.carrier.currency]
+            if request.carrier.currency == 'RUB':
+                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            else :
+                converted_price = request.carrier.rate * self.context[request.carrier.currency]
             total_sum += converted_price
 
         return(round(total_sum, 2))

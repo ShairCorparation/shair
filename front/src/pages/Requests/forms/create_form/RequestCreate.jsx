@@ -1,12 +1,12 @@
 import {
     Grid, Card, CardContent, CardActions, CardHeader, Button, FormControl, InputLabel, Select,
-    MenuItem, TextField, Paper, Typography, IconButton, Box
+    MenuItem, TextField, Paper, Typography, IconButton
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import CircularProgress from '@mui/material/CircularProgress';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { ru } from 'date-fns/locale/ru';
 import { ruRU } from '@mui/x-date-pickers/locales';
 import { useForm, Controller } from 'react-hook-form'
 import CreateClient from '../create_client/CreateClient';
@@ -21,8 +21,9 @@ export default function RequestCreate() {
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
 
-    const handleSave = (form_date) => {
-        api(`/api/requests/`, 'POST', form_date)
+    const handleSave = (form_data) => {
+
+        api(`/api/requests/`, 'POST', form_data)
             .then((res) => {
                 window.location.href = '/'
             })
@@ -155,11 +156,8 @@ export default function RequestCreate() {
                                             fullWidth
                                             label="Палеты"
                                             placeholder="Палеты"
-                                            {...register('pallets', {
-                                                required: true,
-                                            })}
+                                            {...register('pallets')}
                                         />
-                                        <FormError error={errors?.pallets} />
                                     </Grid>
 
                                     <Grid item xs={12} md={6} p={1}>
@@ -167,11 +165,8 @@ export default function RequestCreate() {
                                             fullWidth
                                             label="Длина"
                                             placeholder="Длина"
-                                            {...register('yardage', {
-                                                required: true,
-                                            })}
+                                            {...register('yardage')}
                                         />
-                                        <FormError error={errors?.yardage} />
                                     </Grid>
 
                                     <Grid item xs={12} md={6} p={1}>
@@ -179,11 +174,8 @@ export default function RequestCreate() {
                                             fullWidth
                                             label="Ширина"
                                             placeholder="Ширина"
-                                            {...register('width', {
-                                                required: true,
-                                            })}
+                                            {...register('width')}
                                         />
-                                        <FormError error={errors?.width} />
                                     </Grid>
 
                                     <Grid item xs={12} md={6} p={1}>
@@ -191,11 +183,8 @@ export default function RequestCreate() {
                                             fullWidth
                                             label="Высота"
                                             placeholder="Высота"
-                                            {...register('height', {
-                                                required: true,
-                                            })}
+                                            {...register('height')}
                                         />
-                                        <FormError error={errors?.height} />
                                     </Grid>
 
                                     <Grid item xs={12} md={6} p={1}>
@@ -203,11 +192,8 @@ export default function RequestCreate() {
                                             fullWidth
                                             label="Объем"
                                             placeholder="Объем"
-                                            {...register('volume', {
-                                                required: true,
-                                            })}
+                                            {...register('volume')}
                                         />
-                                        <FormError error={errors?.volume} />
                                     </Grid>
 
                                     <Grid item xs={12} p={1}>
@@ -227,8 +213,8 @@ export default function RequestCreate() {
                                     <Typography variant='body1'>Информация о доставке</Typography>
                                 </Grid>
                                 <Grid item xs={12} md={6} p={1}>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}
-                                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
+                                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+                                    
                                         <Controller
                                             name="date_of_shipment"
                                             control={control}
@@ -238,10 +224,12 @@ export default function RequestCreate() {
                                             defaultValue={null}
                                             render={({ field }) => (
                                                 <DatePicker
+                                                    localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
                                                     className='date_picker'
+                                                    format="yyyy-MM-dd"
                                                     label="Дата загрузки"
                                                     value={field.value}
-                                                    onChange={(value) => field.onChange(value.format('YYYY-MM-DD'))}
+                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth()+1}-${value.getDate()}`)}
                                                 />
                                             )} />
                                     </LocalizationProvider>
@@ -249,9 +237,7 @@ export default function RequestCreate() {
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}
-                                        localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
-                                    >
+                                    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
                                         <Controller
                                             name="date_of_delivery"
                                             control={control}
@@ -262,10 +248,11 @@ export default function RequestCreate() {
                                             render={({ field }) => (
                                                 <DatePicker
                                                     localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
+                                                    format="yyyy-MM-dd"
                                                     className='date_picker'
                                                     label="Дата доставки"
                                                     value={field.value}
-                                                    onChange={(value) => field.onChange(value.format('YYYY-MM-DD'))}
+                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth()+1}-${value.getDate()}`)}
                                                 />
                                             )} />
                                     </LocalizationProvider>
@@ -318,11 +305,8 @@ export default function RequestCreate() {
                                         fullWidth
                                         label="Адрес отгрузки"
                                         placeholder="Адрес отгрузки"
-                                        {...register('address_of_dispatch', {
-                                            required: true,
-                                        })}
+                                        {...register('address_of_dispatch')}
                                     />
-                                    <FormError error={errors?.address_of_dispatch} />
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
@@ -330,11 +314,8 @@ export default function RequestCreate() {
                                         fullWidth
                                         label="Адрес доставки"
                                         placeholder="Адрес доставки"
-                                        {...register('delivery_address', {
-                                            required: true,
-                                        })}
+                                        {...register('delivery_address')}
                                     />
-                                    <FormError error={errors?.delivery_address} />
                                 </Grid>
                             </Grid>
                         </Grid>

@@ -1,23 +1,20 @@
 import {
     Grid, Card, CardContent, CardActions, CardHeader, Button, FormControl, InputLabel, Select,
-    MenuItem, TextField, Paper, Typography, IconButton, Box, DialogContent, Dialog, DialogTitle
+    MenuItem, TextField, Paper, Typography, IconButton, DialogContent, Dialog, DialogTitle
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
-import CircularProgress from '@mui/material/CircularProgress';
+import { ru } from 'date-fns/locale/ru';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { ruRU } from '@mui/x-date-pickers/locales';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { useForm, Controller } from 'react-hook-form'
 import CreateClient from '../create_client/CreateClient';
 import * as React from 'react';
 import { api } from '../../../../api/api';
 import FormError from '../../../../components/FormError/FormError';
 import ErrorMessage from '../../../../components/ErrorMesage/ErrorMesage';
-import axios from 'axios';
-import dayjs from 'dayjs';
 import '../create_form/request_create.css'
 
 
@@ -40,33 +37,31 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const [req, setReq] = React.useState(null)
     const [open, setOpen] = React.useState(false);
 
-    const handleSave = (form_date) => {
-        form_date.date_of_delivery = form_date.date_of_delivery.format('YYYY-MM-DD')
-        form_date.date_of_shipment = form_date.date_of_shipment.format('YYYY-MM-DD')
-        api(`/api/requests/${request.id}/`, 'PATCH', form_date)
+    const handleSave = (form_data) => {
+
+        let delivery = form_data.date_of_delivery
+        let dispatch = form_data.date_of_shipment
+        form_data.date_of_delivery = `${delivery.getFullYear()}-${delivery.getMonth()+1}-${delivery.getDate()}`
+        form_data.date_of_shipment = `${dispatch.getFullYear()}-${dispatch.getMonth()+1}-${dispatch.getDate()}`
+        api(`/api/requests/${request.id}/`, 'PATCH', form_data)
             .then((res) => {
                 setAlertInfo({ open: true, color: 'success', message: res.data.message })
                 setLoader(true)
             })
             .catch((err) => {
-
             })
     }
 
     React.useEffect(() => {
-
         api('/api/clients/', 'GET').then((res) => {
             setClients(res.data)
         })
-
         api(`/api/requests/${request.id}/`, 'GET').then((res) => {
             setReq(res.data)
         })
-
         if (point !== '') {
             api(`/api/carriers/${request.id}/by_request/`, 'GET').then((res) => { setCarriers(res.data) })
         }
-
     }, [])
 
 
@@ -224,11 +219,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         label="Палеты"
                                                         placeholder="Палеты"
                                                         defaultValue={req.pallets}
-                                                        {...register('pallets', {
-                                                            required: true,
-                                                        })}
+                                                        {...register('pallets')}
                                                     />
-                                                    <FormError error={errors?.pallets} />
                                                 </Grid>
 
                                                 <Grid item xs={12} md={6} p={1}>
@@ -237,11 +229,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         label="Длина"
                                                         placeholder="Длина"
                                                         defaultValue={req.yardage}
-                                                        {...register('yardage', {
-                                                            required: true,
-                                                        })}
+                                                        {...register('yardage')}
                                                     />
-                                                    <FormError error={errors?.yardage} />
                                                 </Grid>
 
                                                 <Grid item xs={12} md={6} p={1}>
@@ -250,11 +239,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         label="Ширина"
                                                         placeholder="Ширина"
                                                         defaultValue={req.width}
-                                                        {...register('width', {
-                                                            required: true,
-                                                        })}
+                                                        {...register('width')}
                                                     />
-                                                    <FormError error={errors?.width} />
                                                 </Grid>
 
                                                 <Grid item xs={12} md={6} p={1}>
@@ -263,11 +249,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         label="Высота"
                                                         placeholder="Высота"
                                                         defaultValue={req.height}
-                                                        {...register('height', {
-                                                            required: true,
-                                                        })}
+                                                        {...register('height')}
                                                     />
-                                                    <FormError error={errors?.height} />
                                                 </Grid>
 
                                                 <Grid item xs={12} md={6} p={1}>
@@ -276,11 +259,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         label="Объем"
                                                         placeholder="Объем"
                                                         defaultValue={req.volume}
-                                                        {...register('volume', {
-                                                            required: true,
-                                                        })}
+                                                        {...register('volume')}
                                                     />
-                                                    <FormError error={errors?.volume} />
                                                 </Grid>
 
                                                 <Grid item xs={12} p={1}>
@@ -301,19 +281,17 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                 <Typography variant='body1'>Информация о доставке</Typography>
                                             </Grid>
                                             <Grid item xs={12} md={6} p={1}>
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}
-                                                    localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
+                                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
                                                     <Controller
                                                         name="date_of_shipment"
                                                         control={control}
                                                         rules={{
                                                             required: true,
                                                         }}
-                                                        defaultValue={dayjs(req.date_of_shipment)}
-
+                                                        defaultValue={new Date(req.date_of_shipment)}
                                                         render={({ field }) => (
                                                             <DatePicker
-
+                                                                format="yyyy-MM-dd"
                                                                 className='date_picker'
                                                                 label="Дата загрузки"
                                                                 value={field.value}
@@ -325,21 +303,17 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                             </Grid>
 
                                             <Grid item xs={12} md={6} p={1}>
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}
-                                                    localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}
-                                                >
+                                                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
                                                     <Controller
                                                         name="date_of_delivery"
                                                         control={control}
                                                         rules={{
                                                             required: true,
                                                         }}
-                                                        defaultValue={dayjs(req.date_of_delivery)}
-
-
+                                                        defaultValue={new Date(req.date_of_delivery)}
                                                         render={({ field }) => (
                                                             <DatePicker
-
+                                                                format="yyyy-MM-dd"
                                                                 className='date_picker'
                                                                 label="Дата доставки"
                                                                 value={field.value}
@@ -400,11 +374,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                     label="Адрес отгрузки"
                                                     placeholder="Адрес отгрузки"
                                                     defaultValue={req.address_of_dispatch}
-                                                    {...register('address_of_dispatch', {
-                                                        required: true,
-                                                    })}
+                                                    {...register('address_of_dispatch')}
                                                 />
-                                                <FormError error={errors?.address_of_dispatch} />
                                             </Grid>
 
                                             <Grid item xs={12} md={6} p={1}>
@@ -413,11 +384,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                     label="Адрес доставки"
                                                     placeholder="Адрес доставки"
                                                     defaultValue={req.delivery_address}
-                                                    {...register('delivery_address', {
-                                                        required: true,
-                                                    })}
+                                                    {...register('delivery_address')}
                                                 />
-                                                <FormError error={errors?.delivery_address} />
                                             </Grid>
 
 
