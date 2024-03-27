@@ -5,6 +5,7 @@ import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
 import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import Requests from '../Requests/Requests';
 import ErrorMessage from '../../components/ErrorMesage/ErrorMesage';
 import Orders from '../Orders/Orders';
@@ -12,6 +13,7 @@ import Clients from '../Clients/Clients';
 import Carriers from '../Carriers/Carriers';
 import Reports from '../Reports/Reports';
 import Profile from '../Profile/Profile';
+import Archive from '../Archive/Archive';
 import { useState } from 'react'
 import './main-page.css'
 
@@ -45,6 +47,9 @@ export default function MainPage() {
 
                         <BottomNavigationAction label="Отчеты" className={value==='reports' ? 'active_reports' : 'reports'}
                             value='reports' icon={<ArticleRoundedIcon />} />
+
+                        <BottomNavigationAction label="Архив" className={value==='archive' ? 'active_archive' : 'archive'}
+                            value='archive' icon={<ImportContactsIcon />} />
                         
                         <BottomNavigationAction label="Профиль" className={value==='profile' ? 'active_profile' : 'profile'}
                             value='profile' icon={<AccountCircleIcon />} />
@@ -58,6 +63,7 @@ export default function MainPage() {
                     {value === 'clients' && <Clients />}
                     {value === 'carriers' && <Carriers />}
                     {value === 'reports' && <Reports /> }
+                    {value === 'archive' && <Archive /> }
                     {value === 'profile' && <Profile /> }
                 </Grid>
                 <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />

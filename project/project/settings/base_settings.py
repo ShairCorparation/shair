@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     'drf_spectacular_sidecar',
     'back.apps.BackConfig',
     'app.apps.AppConfig',
+    'django_cleanup.apps.CleanupConfig',
     'rest_framework_simplejwt.token_blacklist',
-
 ]
 
 MIDDLEWARE = [

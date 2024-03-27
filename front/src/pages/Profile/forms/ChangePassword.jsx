@@ -28,10 +28,6 @@ export default function ChangePassword({ setAlertInfo }) {
                                 placeholder="Новый пароль"
                                 {...register('password', {
                                     required: true,
-                                    pattern: {
-                                        value: /.*([a-z]+[A-Z]+[0-9]+|[a-z]+[0-9]+[A-Z]+|[A-Z]+[a-z]+[0-9]+|[A-Z]+[0-9]+[a-z]+|[0-9]+[a-z]+[A-Z]+|[0-9]+[A-Z]+[a-z]+).*/,
-                                        message: 'Пароль должен состоять из символов нижнего и верхнего регистров, латинских букв, цифр и спец знаков!'
-                                    },
                                     minLength: {
                                         value: 8,
                                         message: 'Пароль должен состоять как минимум из 8 знаков!'

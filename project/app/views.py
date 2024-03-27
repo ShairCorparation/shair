@@ -7,10 +7,15 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from app.filters import client_filters, carrier_filters
 from app.helpers import get_currencies
+from project.settings.django_environ import env
+import requests
 
+
+OXILOR_URL = env('OXILOR_URL')
+OXILOR_KEY = env('OXILOR_KEY')
 
 class ClientViewSet(
     mixins.ListModelMixin,
@@ -131,6 +136,12 @@ class RequestViewSet(
         serializer = OrdersSerializer(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @action(detail=False, methods=['GET'])
+    def archived(self, request, *args, **kwargs):
+        instances = self.get_queryset().filter(status='archived')
+        serializer = OrdersSerializer(instances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class CarrierViewSet(
     mixins.ListModelMixin,
@@ -214,7 +225,6 @@ class DocsRequestsViewSet(
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def create(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -228,4 +238,7 @@ class DocsRequestsViewSet(
 
 
         
-        
+@api_view()
+def get_countries(request, *args, **kwargs):
+    res = requests.get(f'{OXILOR_URL}/countries', headers= {'Accept-Language': 'ru'}, params={'key': OXILOR_KEY})
+    return Response(res.json(), status=status.HTTP_200_OK)

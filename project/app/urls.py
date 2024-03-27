@@ -10,5 +10,6 @@ router.register(r"docs", views.DocsRequestsViewSet, basename='docs')
 
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('countries/', views.get_countries),
 ]

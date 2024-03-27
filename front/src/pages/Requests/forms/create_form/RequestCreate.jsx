@@ -1,6 +1,6 @@
 import {
     Grid, Card, CardContent, CardActions, CardHeader, Button, FormControl, InputLabel, Select,
-    MenuItem, TextField, Paper, Typography, IconButton
+    MenuItem, TextField, Paper, Typography, IconButton, Autocomplete
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
@@ -20,6 +20,7 @@ export default function RequestCreate() {
     const { register, control, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
+    const [countries, setCountries] = useState()
 
     const handleSave = (form_data) => {
 
@@ -34,6 +35,10 @@ export default function RequestCreate() {
     useEffect(() => {
         api('/api/clients/', 'GET').then((res) => {
             setClients(res.data)
+        })
+
+        api('/api/countries/').then((res) => {
+            setCountries([...res.data])
         })
 
     }, [])
@@ -214,7 +219,7 @@ export default function RequestCreate() {
                                 </Grid>
                                 <Grid item xs={12} md={6} p={1}>
                                     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-                                    
+
                                         <Controller
                                             name="date_of_shipment"
                                             control={control}
@@ -229,7 +234,7 @@ export default function RequestCreate() {
                                                     format="yyyy-MM-dd"
                                                     label="Дата загрузки"
                                                     value={field.value}
-                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth()+1}-${value.getDate()}`)}
+                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`)}
                                                 />
                                             )} />
                                     </LocalizationProvider>
@@ -252,7 +257,7 @@ export default function RequestCreate() {
                                                     className='date_picker'
                                                     label="Дата доставки"
                                                     value={field.value}
-                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth()+1}-${value.getDate()}`)}
+                                                    onChange={(value) => field.onChange(`${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`)}
                                                 />
                                             )} />
                                     </LocalizationProvider>
@@ -260,22 +265,35 @@ export default function RequestCreate() {
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-                                    <TextField type="text" size='small'
-                                        fullWidth
-                                        label="Страна отгрузки"
-                                        placeholder="Страна отгрузки"
+
+                                    <Autocomplete
+                                        disablePortal
+                                        id="combo-box-demo"
                                         {...register('country_of_dispatch', { required: true })}
+                                        fullWidth
+                                        size='small'
+                                        getOptionLabel={(option) => option.name}
+                                        options={countries}
+
+                                        renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
+
                                     <FormError error={errors?.country_of_dispatch} />
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-                                    <TextField type="text" size='small'
-                                        fullWidth
-                                        label="Страна доставки"
-                                        placeholder="Страна доставки"
+                                    <Autocomplete
+                                        disablePortal
+                                        id="combo-box-demo"
                                         {...register('delivery_country', { required: true })}
+                                        fullWidth
+                                        size='small'
+                                        getOptionLabel={(option) => option.name}
+                                        options={countries}
+
+                                        renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
                                     />
+
                                     <FormError error={errors?.delivery_country} />
                                 </Grid>
 

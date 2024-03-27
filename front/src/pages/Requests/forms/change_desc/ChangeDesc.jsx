@@ -1,12 +1,13 @@
 import {
-    Grid, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material'
+    Grid, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField
+} from '@mui/material'
 import FormError from '../../../../components/FormError/FormError';
-import { useForm} from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { api } from '../../../../api/api';
 import '../take_to_job/take_to_job.css'
 
 
-export default function ChangeDesc({ setOpen, open, currentReq, setLoader, setAlertInfo, setCurrentReq }) {
+export default function ChangeDesc({ setOpen, open, currentReq, setLoader, setAlertInfo, setCurrentReq, purpose = '' }) {
     const { register, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
 
     const handleClose = () => {
@@ -60,10 +61,11 @@ export default function ChangeDesc({ setOpen, open, currentReq, setLoader, setAl
 
                     </Grid>
                 </DialogContent>
-                <DialogActions>
-                    <Button type='submit' variant='outlined' color='success'>Обновить примечание</Button>
-
-                </DialogActions>
+                {purpose !== 'archive' &&
+                    <DialogActions>
+                        <Button type='submit' variant='outlined' color='success'>Обновить примечание</Button>
+                    </DialogActions>
+                }
             </form>
 
         </Dialog>

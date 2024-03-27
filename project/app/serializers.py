@@ -100,6 +100,22 @@ class OrdersSerializer(serializers.ModelSerializer):
 
 class ClientFinesSerializer(serializers.ModelSerializer):
     sum_fines = serializers.SerializerMethodField()
+    sum_carrier_price = serializers.SerializerMethodField()
+
+
+    def get_sum_carrier_price(self, instance):
+        requests = Request.objects.filter(status='on it', payment_from_carrier=True, client=instance.id).only('carrier')
+        total_sum = 0
+
+        for request in requests:
+            if request.currency == 'RUB':
+                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            else:
+                converted_price = request.carrier.rate * self.context[request.carrier.currency]
+            total_sum += converted_price 
+            
+        return(round(total_sum, 2))
+
 
     def get_sum_fines(self, instance):
         requests = Request.objects.filter(status='on it', payment_from_client=False, client=instance.id).only('currency', 'customer_price')

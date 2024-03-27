@@ -56,6 +56,7 @@ export default function Fines() {
                                 <TableCell align="left">Название компании</TableCell>
                                 <TableCell align="left">УНП</TableCell>
                                 <TableCell align="left">Контакт</TableCell>
+                                <TableCell align="left">Оплата перевозчика</TableCell>
                                 <TableCell align="left">Сумма неоплаченных заказов</TableCell>
                             </TableRow>
                         </TableHead>
@@ -68,6 +69,7 @@ export default function Fines() {
                                     <TableCell align="left" component="th" scope="row">{client?.company_name}</TableCell>
                                     <TableCell align="left">{client?.unp}</TableCell>
                                     <TableCell align="left">{client?.contact_person}</TableCell>
+                                    <TableCell align="left">{client?.sum_carrier_price}</TableCell>
                                     <TableCell align="left">{client?.sum_fines} BYN</TableCell>
                                 </TableRow>
                             ))}

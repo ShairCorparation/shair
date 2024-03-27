@@ -1,6 +1,6 @@
 import {
     Grid, Card, CardContent, CardActions, CardHeader, Button, FormControl, InputLabel, Select,
-    MenuItem, TextField, Paper, Typography, IconButton, DialogContent, Dialog, DialogTitle
+    MenuItem, TextField, Paper, Typography, IconButton, DialogContent, Dialog, DialogTitle, Autocomplete
 } from '@mui/material'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import CloseIcon from '@mui/icons-material/Close';
@@ -29,20 +29,23 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 
 export default function RequestEdit({ request, openDialog, setOpenDialog, point = '', setLoader, setCurrentReq }) {
-    const { register, control, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
+    const { register, control, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
 
     const [clients, setClients] = React.useState(null)
     const [carriers, setCarriers] = React.useState(null)
-    const [req, setReq] = React.useState(null)
+    const [req, setReq] = React.useState()
     const [open, setOpen] = React.useState(false);
+    const [countries, setCountries] = React.useState([])
+
 
     const handleSave = (form_data) => {
 
         let delivery = form_data.date_of_delivery
         let dispatch = form_data.date_of_shipment
-        form_data.date_of_delivery = `${delivery.getFullYear()}-${delivery.getMonth()+1}-${delivery.getDate()}`
-        form_data.date_of_shipment = `${dispatch.getFullYear()}-${dispatch.getMonth()+1}-${dispatch.getDate()}`
+        form_data.date_of_delivery = `${delivery.getFullYear()}-${delivery.getMonth() + 1}-${delivery.getDate()}`
+        form_data.date_of_shipment = `${dispatch.getFullYear()}-${dispatch.getMonth() + 1}-${dispatch.getDate()}`
+
         api(`/api/requests/${request.id}/`, 'PATCH', form_data)
             .then((res) => {
                 setAlertInfo({ open: true, color: 'success', message: res.data.message })
@@ -52,12 +55,22 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             })
     }
 
+
     React.useEffect(() => {
+
         api('/api/clients/', 'GET').then((res) => {
             setClients(res.data)
         })
+
+        api('/api/countries/').then((res) => {
+            setCountries([...res.data])
+        })
+
         api(`/api/requests/${request.id}/`, 'GET').then((res) => {
             setReq(res.data)
+            setValue('country_of_dispatch', res.data.country_of_dispatch)
+            setValue('delivery_country', res.data.delivery_country)
+
         })
         if (point !== '') {
             api(`/api/carriers/${request.id}/by_request/`, 'GET').then((res) => { setCarriers(res.data) })
@@ -324,27 +337,47 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                 <FormError error={errors?.date_of_delivery} />
                                             </Grid>
 
-                                            <Grid item xs={12} md={6} p={1}>
-                                                <TextField type="text" size='small'
-                                                    fullWidth
-                                                    label="Страна отгрузки"
-                                                    placeholder="Страна отгрузки"
-                                                    defaultValue={req.country_of_dispatch}
-                                                    {...register('country_of_dispatch', { required: true })}
-                                                />
-                                                <FormError error={errors?.country_of_dispatch} />
-                                            </Grid>
+                                            {countries.length > 0 &&
+                                                <React.Fragment>
+                                                    <Grid item xs={12} md={6} p={1}>
 
-                                            <Grid item xs={12} md={6} p={1}>
-                                                <TextField type="text" size='small'
-                                                    fullWidth
-                                                    label="Страна доставки"
-                                                    placeholder="Страна доставки"
-                                                    defaultValue={req.delivery_country}
-                                                    {...register('delivery_country', { required: true })}
-                                                />
-                                                <FormError error={errors?.delivery_country} />
-                                            </Grid>
+
+
+                                                        <Autocomplete
+                                                            {...register('country_of_dispatch', { required: true })}
+                                                            disablePortal
+                                                            id="combo-box-demo"
+                                                            fullWidth
+                                                            onChange={(event, v) => setValue('country_of_dispatch', v.name)}
+                                                            size='small'
+                                                            defaultValue={countries.find((country, index) => country.name === req.country_of_dispatch)}
+                                                            options={countries}
+                                                            getOptionLabel={(option) => option.name}
+                                                            renderInput={(params) => <TextField  {...params} label="Страна отгрузки" />}
+                                                        />
+
+                                                        <FormError error={errors?.country_of_dispatch} />
+                                                    </Grid>
+
+                                                    <Grid item xs={12} md={6} p={1}>
+
+                                                        <Autocomplete
+                                                            {...register('delivery_country', { required: true })}
+                                                            disablePortal
+                                                            id="combo-box-demo"
+                                                            fullWidth
+                                                            onChange={(event, v) => setValue('delivery_country', v.name)}
+                                                            size='small'
+                                                            defaultValue={countries.find((country, index) => country.name === req.delivery_country)}
+                                                            options={countries}
+                                                            getOptionLabel={(option) => option.name}
+                                                            renderInput={(params) => <TextField  {...params} label="Страна доставки" />}
+                                                        />
+
+                                                        <FormError error={errors?.delivery_country} />
+                                                    </Grid>
+                                                </React.Fragment>
+                                            }
 
                                             <Grid item xs={12} md={6} p={1}>
                                                 <TextField type="text" size='small'

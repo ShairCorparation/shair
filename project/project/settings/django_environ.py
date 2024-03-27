@@ -13,4 +13,7 @@ env = environ.Env(
     BACKEND_URL=(str, 'http://localhost:8000'),
 
     FILE_STORAGE=(str, 'local'),
+
+    OXILOR_URL=(str, ''),
+    OXILOR_KEY=(str, ''),
 )
