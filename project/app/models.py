@@ -99,5 +99,5 @@ class Currency(models.Model):
         verbose_name_plural = 'Валюты'
 
     def __str__(self):
-        return f'{self.usd} {self.eur} {self.rub} {self.byn}'
+        return f'{self.USD} {self.EUR} {self.RUB} '
     
