@@ -104,4 +104,11 @@ class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSe
         executors_id = Request.objects.filter(status='complete').values_list('executor', flat=True)
         serializer = serializers.OvercomesUserSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['GET'])
+    def fines(self, request, *args, **kwargs):
+        currency_data = get_currencies()
+        executors_id = Request.objects.filter(status='on it', payment_from_client=False, payment_from_carrier=False).values_list('executor', flat=True)
+        serializer = serializers.ExecutorFinesSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 

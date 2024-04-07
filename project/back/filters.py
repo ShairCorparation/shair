@@ -45,8 +45,9 @@ def user_filters(request, queryset):
         executors_id = Request.objects.get(pk=request_id).values_list('executor', flat=True)
         queryset = queryset.filter(pk__in=executors_id)
     
-    if executor:
-        executors_id = Request.objects.get(executor__pk=executor).values_list('executor', flat=True)
+    if executor and executor != '0':
+        executors_id = Request.objects.filter(executor__pk=executor).values_list('executor', flat=True)
         queryset = queryset.filter(pk__in=executors_id)
+
 
     return queryset.order_by('first_name')

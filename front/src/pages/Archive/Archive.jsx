@@ -83,7 +83,7 @@ export default function Archive() {
                                 key={req.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">{req.id}</TableCell>
+                                <TableCell component="th" scope="row">#{req.id}</TableCell>
                                 <TableCell align="left">{req.date_of_request}</TableCell>
                                 <TableCell align="left">
                                     {req.client.contact_person}

@@ -60,8 +60,8 @@ export default function Consumption() {
         let res
         currency === 'USD' && (res = amount * USD)
         currency === 'EUR' && (res = amount * EUR)
-        currency === 'RUB' && (res = amount * RUB)
-        return res;
+        currency === 'RUB' && (res = amount * RUB / 100)
+        return res.toFixed(2);
     };
 
     return (

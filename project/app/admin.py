@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app.models import Client, Request, Carrier, Docs
+from app.models import Client, Request, Carrier, Docs, Currency
 
 
 class DocsRequestInline(admin.TabularInline):
@@ -7,6 +7,10 @@ class DocsRequestInline(admin.TabularInline):
     extra = 0
     fields = ['name', 'file']
 
+@admin.register(Currency)
+class CurrencyAdminv(admin.ModelAdmin):
+    list_display = ['USD', 'EUR', 'RUB']
+    list_filter = ['USD', 'EUR', 'RUB']
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
@@ -17,8 +21,8 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
     inlines = (DocsRequestInline,)
-    list_display = ['name_of_cargo', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
-    list_filter = ['name_of_cargo', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
+    list_display = ['name_of_cargo', 'executor', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
+    list_filter = ['name_of_cargo', 'executor', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
 
 
 @admin.register(Carrier)

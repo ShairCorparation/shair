@@ -9,12 +9,14 @@ export default function Fines() {
     const [clients, setClients] = useState(null)
 
     const initial_data = {
-        company_name_on_it: '', unp_on_it: ''
+        company_name_on_it: '', unp_on_it: '', executor: 0
     }
 
     const [filterData, setFilterData] = useState(initial_data)
     const [sendFilter, setSendFilter] = useState(false)
     const [filterOpen, setFilterOpen] = useState(false)
+
+    const [selector, setSelector] = useState('client')
 
     useEffect(() => {
         api('/api/clients/fines/').then((res) => {
@@ -24,16 +26,29 @@ export default function Fines() {
     }, [])
 
     useEffect(() => {
-        api(`/api/clients/fines/`, 'GET', {}, false,
-            {
-                params: {
-                    company_name_on_it: filterData.company_name_on_it,
-                    unp_on_it: filterData.unp_on_it,
+        if (selector === 'client') {
+            api(`/api/clients/fines/`, 'GET', {}, false,
+                {
+                    params: {
+                        company_name_on_it: filterData.company_name_on_it,
+                        unp_on_it: filterData.unp_on_it,
+                    }
                 }
-            }
-        ).then((res) => {
-            setClients(res.data)
-        })
+            ).then((res) => {
+                setClients(res.data)
+            })
+        }
+
+        if (selector === 'manager') {
+
+            api(`/auth/users_info/fines/`, 'GET', {}, false,
+                {
+                    params: {
+                        executor: filterData.executor
+                    }
+                }
+            ).then((res) => setClients(res.data))
+        }
 
     }, [sendFilter])
 
@@ -45,7 +60,7 @@ export default function Fines() {
                     {filterOpen ? 'Скрыть фильтры' : 'Показать фильтры'}
                 </Button>
                 {filterOpen &&
-                    <FinesFilter setFilterData={setFilterData} filterData={filterData} setSendFilter={setSendFilter} sendFilter={sendFilter} initial_data={initial_data} />
+                    <FinesFilter setFilterData={setFilterData} filterData={filterData} setSendFilter={setSendFilter} sendFilter={sendFilter} initial_data={initial_data} setSelector={setSelector} selector={selector} />
                 }
             </Grid>
             <Grid item xs={12} md={8} m={1}>
@@ -53,10 +68,11 @@ export default function Fines() {
                     <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow>
-                                <TableCell align="left">Название компании</TableCell>
-                                <TableCell align="left">УНП</TableCell>
-                                <TableCell align="left">Контакт</TableCell>
-                                <TableCell align="left">Оплата перевозчика</TableCell>
+                                {selector === 'client' && <TableCell align="left">Название компании</TableCell>}
+                                {selector === 'client' && <TableCell align="left">УНП</TableCell>}
+                                {selector === 'client' && <TableCell align="left">Контакт</TableCell>}
+                                {selector === 'manager' && <TableCell align="left">Менеджер</TableCell>}
+                                <TableCell align="left">Оплата перевозчику</TableCell>
                                 <TableCell align="left">Сумма неоплаченных заказов</TableCell>
                             </TableRow>
                         </TableHead>
@@ -66,10 +82,12 @@ export default function Fines() {
                                     key={client?.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell align="left" component="th" scope="row">{client?.company_name}</TableCell>
-                                    <TableCell align="left">{client?.unp}</TableCell>
-                                    <TableCell align="left">{client?.contact_person}</TableCell>
-                                    <TableCell align="left">{client?.sum_carrier_price}</TableCell>
+                                    {selector === 'client' && <TableCell align="left" component="th" scope="row">{client?.company_name}</TableCell>}
+                                    {selector === 'client' && <TableCell align="left">{client?.unp}</TableCell>}
+                                    {selector === 'client' && <TableCell align="left">{client?.contact_person}</TableCell>}
+                                    {selector === 'manager' && <TableCell align="left">{client?.first_name} {client?.last_name}</TableCell>}
+
+                                    <TableCell align="left">{client?.sum_carrier_price} BYN</TableCell>
                                     <TableCell align="left">{client?.sum_fines} BYN</TableCell>
                                 </TableRow>
                             ))}

@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from app.models import Carrier, Client, Request, Docs
+from app.models import Carrier, Client, Request, Docs, Currency
 from app.serializers import ClientSerializer, RequestSerializer, CarrierSerializer, \
-        OrdersSerializer, DocsRequestSerializer, ClientFinesSerializer, ClientOvercomesSerializer, RequestListSerializer
+        OrdersSerializer, DocsRequestSerializer, ClientFinesSerializer, ClientOvercomesSerializer, RequestListSerializer, \
+        CountriesSerializer
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -9,9 +10,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view
 from app.filters import client_filters, carrier_filters
-from app.helpers import get_currencies
 from project.settings.django_environ import env
-import requests
+from app.helpers import get_currencies
+import json
 
 
 OXILOR_URL = env('OXILOR_URL')
@@ -138,7 +139,7 @@ class RequestViewSet(
     
     @action(detail=False, methods=['GET'])
     def archived(self, request, *args, **kwargs):
-        instances = self.get_queryset().filter(status='archived')
+        instances = self.get_queryset().filter(status__in=['archived', 'complete'])
         serializer = OrdersSerializer(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -220,7 +221,7 @@ class DocsRequestsViewSet(
         return Docs.objects.all()
     
     def list(self, request, *args, **kwargs):
-        docs = self.get_queryset().filter(request=request.query_params['request_id'][0])
+        docs = self.get_queryset().filter(request=request.query_params['request_id'])
         serializer = self.serializer_class(docs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -239,6 +240,15 @@ class DocsRequestsViewSet(
 
         
 @api_view()
-def get_countries(request, *args, **kwargs):
-    res = requests.get(f'{OXILOR_URL}/countries', headers= {'Accept-Language': 'ru'}, params={'key': OXILOR_KEY})
-    return Response(res.json(), status=status.HTTP_200_OK)
+def get_countries_and_cities(request, *args, **kwargs):
+    data = {'countries': set(), 'cities': set()}
+    instance = Request.objects.all()
+    for el in instance:
+        data['countries'].update({el.country_of_dispatch, el.delivery_country})
+        data['cities'].update({el.city_of_dispatch, el.delivery_city})
+    data['countries'] = list(data['countries'])
+    data['cities'] = list(data['cities'])
+
+    json_data = json.dumps(data, ensure_ascii=False)
+
+    return Response(json_data, status=status.HTTP_200_OK)

@@ -104,7 +104,7 @@ class ClientFinesSerializer(serializers.ModelSerializer):
 
 
     def get_sum_carrier_price(self, instance):
-        requests = Request.objects.filter(status='on it', payment_from_carrier=True, client=instance.id).only('carrier')
+        requests = Request.objects.filter(status='on it', payment_from_carrier=False, client=instance.id).only('carrier')
         total_sum = 0
 
         for request in requests:
@@ -170,5 +170,12 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
         fields = '__all__'
+
+
+class CountriesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Request
+        fields = ['country_of_dispatch', 'city_of_dispatch', 'delivery_country', 'delivery_city']
 
 

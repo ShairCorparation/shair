@@ -21,6 +21,9 @@ export default function RequestCreate() {
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
     const [countries, setCountries] = useState()
+    const [cities, setCities] = useState()
+    const [valueCountry, setValueCountry] = useState()
+    const [valueCity, setValueCity] = useState()
 
     const handleSave = (form_data) => {
 
@@ -38,10 +41,33 @@ export default function RequestCreate() {
         })
 
         api('/api/countries/').then((res) => {
-            setCountries([...res.data])
+            setCountries([...JSON.parse(res.data)['countries']])
+            setCities([...JSON.parse(res.data)['cities']])
         })
 
     }, [])
+
+
+    useEffect(() => {
+        if (valueCountry) {
+            const timeoutId = setTimeout(() => {
+                if (!countries.includes(valueCountry)) {
+                    setCountries([...countries, valueCountry])
+                }
+            }, 1000);
+            return () => clearTimeout(timeoutId);
+        }
+
+        if (valueCity) {
+            const timeoutId = setTimeout(() => {
+                if (!cities.includes(valueCity)) {
+                    setCities([...cities, valueCity])
+                }
+            }, 350);
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [valueCountry, valueCity]);
 
 
     return (
@@ -265,32 +291,30 @@ export default function RequestCreate() {
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-
                                     <Autocomplete
                                         disablePortal
                                         id="combo-box-demo"
-                                        {...register('country_of_dispatch', { required: true })}
                                         fullWidth
                                         size='small'
-                                        getOptionLabel={(option) => option.name}
+                                        onInput={(e) => setValueCountry(e.target.value)}
+                                        getOptionLabel={(option) => option}
                                         options={countries}
-
                                         renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
-
+                                    
                                     <FormError error={errors?.country_of_dispatch} />
+
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
                                     <Autocomplete
                                         disablePortal
                                         id="combo-box-demo"
-                                        {...register('delivery_country', { required: true })}
                                         fullWidth
                                         size='small'
-                                        getOptionLabel={(option) => option.name}
+                                        onInput={(e) => setValueCountry(e.target.value)}
+                                        getOptionLabel={(option) => option}
                                         options={countries}
-
                                         renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
                                     />
 
@@ -298,22 +322,32 @@ export default function RequestCreate() {
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-                                    <TextField type="text" size='small'
+                                    <Autocomplete
+                                        disablePortal
+                                        id="combo-box-demo"
                                         fullWidth
-                                        label="Город отгрузки"
-                                        placeholder="Город отгрузки"
-                                        {...register('city_of_dispatch', { required: true })}
+                                        size='small'
+                                        getOptionLabel={(option) => option}
+                                        onInput={(e) => setValueCity(e.target.value)}
+                                        options={cities}
+                                        renderInput={(params) => <TextField {...register('city_of_dispatch', { required: true })} {...params} label="Город отгрузки" />}
                                     />
+
                                     <FormError error={errors?.city_of_dispatch} />
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
-                                    <TextField type="text" size='small'
+                                    <Autocomplete
+                                        disablePortal
+                                        id="combo-box-demo"
                                         fullWidth
-                                        label="Город доставки"
-                                        placeholder="Город доставки"
-                                        {...register('delivery_city', { required: true })}
+                                        size='small'
+                                        getOptionLabel={(option) => option}
+                                        onInput={(e) => setValueCity(e.target.value)}
+                                        options={cities}
+                                        renderInput={(params) => <TextField {...register('delivery_city', { required: true })} {...params} label="Город доставки" />}
                                     />
+
                                     <FormError error={errors?.delivery_city} />
                                 </Grid>
 

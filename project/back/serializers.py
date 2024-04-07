@@ -74,3 +74,40 @@ class OvercomesUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'fraht', 'count_request', 'consumption', 'first_name', 'last_name')
 
+
+class ExecutorFinesSerializer(serializers.ModelSerializer):
+    sum_fines = serializers.SerializerMethodField()
+    sum_carrier_price = serializers.SerializerMethodField()
+
+
+    def get_sum_carrier_price(self, instance):
+        requests = Request.objects.filter(status='on it', payment_from_carrier=False, executor=instance.id).only('carrier')
+        total_sum = 0
+
+        for request in requests:
+            if request.currency == 'RUB':
+                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            else:
+                converted_price = request.carrier.rate * self.context[request.carrier.currency]
+            total_sum += converted_price 
+            
+        return(round(total_sum, 2))
+
+
+    def get_sum_fines(self, instance):
+        requests = Request.objects.filter(status='on it', payment_from_client=False, executor=instance.id).only('currency', 'customer_price')
+        total_sum = 0
+
+        for request in requests: 
+            if request.currency == 'RUB':
+                converted_price = request.customer_price * self.context[request.currency] / 100
+            else:
+                converted_price = request.customer_price * self.context[request.currency]   
+            total_sum += converted_price
+ 
+        return(round(total_sum, 2))
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'sum_fines', 'sum_carrier_price']
+

@@ -87,3 +87,17 @@ class Docs(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Currency(models.Model):
+    USD = models.DecimalField(max_digits=6, decimal_places=2)
+    EUR = models.DecimalField(max_digits=6, decimal_places=2)
+    RUB = models.DecimalField(max_digits=6, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Валюты'
+        verbose_name_plural = 'Валюты'
+
+    def __str__(self):
+        return f'{self.usd} {self.eur} {self.rub} {self.byn}'
+    

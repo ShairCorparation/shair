@@ -78,7 +78,7 @@ export default function Orders() {
         currency === 'USD' && (res = amount * USD)
         currency === 'EUR' && (res = amount * EUR)
         currency === 'RUB' && (res = amount * RUB / 100)
-        return res;
+        return res.toFixed(2);
       };
 
     return (
@@ -105,7 +105,7 @@ export default function Orders() {
                                 key={req.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">{req.id}</TableCell>
+                                <TableCell component="th" scope="row">#{req.id}</TableCell>
                                 <TableCell align="left">{req.date_of_request}</TableCell>
                                 <TableCell align="left">
                                     {req.client.contact_person}

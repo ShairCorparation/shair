@@ -47,6 +47,7 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
     };
 
     React.useEffect(() => {
+        console.log(curr_req)
         if (curr_req) {
             api(`/api/docs/`, 'GET', {}, false, { params: { "request_id": curr_req.id } }).then((res) => {
                 setDocs(res.data)

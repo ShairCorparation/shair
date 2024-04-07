@@ -11,6 +11,9 @@ django-registration==3.4.0
 requests==2.31.0
 django-cleanup==8.1.0
 requests==2.31.0
+celery===5.3.6
+redis===5.0.1
+celery-redbeat==2.0.0
 
 
 # DB
