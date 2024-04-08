@@ -3,13 +3,18 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogAc
 import { api } from '../../../../api/api';
 
 
-export default function CompleteOrder({ open, setOpen, request, setLoader }) {
+export default function CompleteOrder({ open, setOpen, request, setLoader, setAlertInfo }) {
 
     function handleComplete() {
-        api(`/api/requests/${request.id}/`, 'PATCH', {status: 'complete'}).then(()=> {
-            setOpen(false)
-            setLoader(true)
-        })
+        if (request.payment_from_carrier && request.payment_from_client) {
+            api(`/api/requests/${request.id}/`, 'PATCH', { status: 'complete' }).then(() => {
+                setOpen(false)
+                setLoader(true)
+            })
+        }
+        else {
+            setAlertInfo({ open: open, color: 'error', message: 'Не проведена оплата по клиенту или перевозчику!' })
+        }
     }
 
     const handleClose = () => {

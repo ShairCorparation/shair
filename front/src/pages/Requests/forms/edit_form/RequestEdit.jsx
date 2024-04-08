@@ -75,6 +75,9 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             setReq(res.data)
             setValue('country_of_dispatch', res.data.country_of_dispatch)
             setValue('delivery_country', res.data.delivery_country)
+
+            setValue('city_of_dispatch', res.data.city_of_dispatch)
+            setValue('delivery_city', res.data.delivery_city)
         })
         if (point !== '') {
             api(`/api/carriers/${request.id}/by_request/`, 'GET').then((res) => { setCarriers(res.data) })
@@ -134,7 +137,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                     <CloseIcon />
                 </IconButton>
                 <DialogContent dividers className='dialog_content'>
-                    <Card sx={{ width: '90%', marginBottom: '10px' }} elevation={10}>
+                    <Card sx={{ width: '90%', marginBottom: '10px', overflow: 'auto !important' }} elevation={10}>
                         <form onSubmit={handleSubmit(handleSave)} className='edit_request'>
                             <CardHeader title='Обновление запроса' align='center' sx={{ marginTop: '20px' }} />
                             {req &&
@@ -404,7 +407,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             id="combo-box-demo"
                                                             fullWidth
                                                             size='small'
-                                                            defaultValue={req.delivery_city}
+                                                            defaultValue={req.city_of_dispatch}
                                                             options={cities}
                                                             getOptionLabel={(option) => option}
                                                             renderInput={(params) => <TextField {...register('city_of_dispatch', { required: true })} {...params} label="Город отгрузки" />}

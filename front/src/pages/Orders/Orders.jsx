@@ -222,7 +222,7 @@ export default function Orders() {
                     <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} />
                     <DeleteRequest open={deleteRequest} setOpen={setDeleteRequest} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} point={'orders'} setCurrentReq={setCureReq} />
                     <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={curr_req} point={'orders'} setLoader={setLoader} setCurrentReq={setCureReq} />
-                    <CompleteOrder open={complete_dialog} setOpen={setCompleteDialog} request={curr_req} setLoader={setLoader} setCurrentReq={setCureReq} />
+                    <CompleteOrder open={complete_dialog} setOpen={setCompleteDialog} request={curr_req} setLoader={setLoader} setCurrentReq={setCureReq} setAlertInfo={setAlertInfo}/>
                 </React.Fragment>
             }
 
