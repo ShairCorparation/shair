@@ -85,25 +85,26 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     }, [])
 
     React.useEffect(() => {
-        if (valueCountry) {
-            const timeoutId = setTimeout(() => {
-                if (!countries.includes(valueCountry)) {
-                    setCountries([...countries, valueCountry])
-                }
-            }, 1000);
-            return () => clearTimeout(timeoutId);
-        }
+        const timeoutId = setTimeout(() => {
+            if (!countries.includes(valueCountry)) {
+                setCountries([...countries, valueCountry])
+            }
+        }, 1000);
+        return () => clearTimeout(timeoutId);
 
-        if (valueCity) {
-            const timeoutId = setTimeout(() => {
-                if (!cities.includes(valueCity)) {
-                    setCities([...cities, valueCity])
-                }
-            }, 350);
+    }, [valueCountry]);
 
-            return () => clearTimeout(timeoutId);
-        }
-    }, [valueCountry, valueCity]);
+
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (!cities.includes(valueCity)) {
+                setCities([...cities, valueCity])
+            }
+        }, 350);
+
+        return () => clearTimeout(timeoutId);
+
+    }, [valueCity])
 
 
     const handleClose = () => {

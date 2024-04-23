@@ -49,25 +49,29 @@ export default function RequestCreate() {
 
 
     useEffect(() => {
-        if (valueCountry) {
-            const timeoutId = setTimeout(() => {
-                if (!countries.includes(valueCountry)) {
-                    setCountries([...countries, valueCountry])
-                }
-            }, 1000);
-            return () => clearTimeout(timeoutId);
-        }
 
-        if (valueCity) {
-            const timeoutId = setTimeout(() => {
-                if (!cities.includes(valueCity)) {
-                    setCities([...cities, valueCity])
-                }
-            }, 350);
+        const timeoutId = setTimeout(() => {
+            if (!countries.includes(valueCountry)) {
+                setCountries([...countries, valueCountry])
+            }
+        }, 1000);
+        return () => clearTimeout(timeoutId);
 
-            return () => clearTimeout(timeoutId);
-        }
-    }, [valueCountry, valueCity]);
+
+
+    }, [valueCountry]);
+
+    useEffect(() => {
+
+        const timeoutId = setTimeout(() => {
+            if (!cities.includes(valueCity)) {
+                setCities([...cities, valueCity])
+            }
+        }, 350);
+
+        return () => clearTimeout(timeoutId);
+
+    }, [valueCity])
 
 
     return (
@@ -301,7 +305,7 @@ export default function RequestCreate() {
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
-                                    
+
                                     <FormError error={errors?.country_of_dispatch} />
 
                                 </Grid>
