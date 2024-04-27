@@ -12,6 +12,7 @@ from rest_framework.decorators import action, api_view
 from app.filters import client_filters, carrier_filters
 from project.settings.django_environ import env
 from app.helpers import get_currencies
+from django.db.utils import IntegrityError
 import json
 
 
@@ -45,10 +46,12 @@ class ClientViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            all_clients = self.serializer_class(self.get_queryset(), many=True) 
-            return Response({'data': all_clients.data, 'message': 'Клиент был успешно создан'}, status=status.HTTP_201_CREATED)
-        return Response({'message': 'Что-то пошло не так!'}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                serializer.save()
+                all_clients = self.serializer_class(self.get_queryset(), many=True) 
+                return Response({'data': all_clients.data, 'message': 'Клиент был успешно создан'}, status=status.HTTP_201_CREATED)
+            except IntegrityError:
+                return Response({'message': 'Данный клиент уже существует!'}, status=status.HTTP_400_BAD_REQUEST)
     
     def destroy(self, request, pk, *args, **kwargs):
         instance = get_object_or_404(Client, pk=pk)

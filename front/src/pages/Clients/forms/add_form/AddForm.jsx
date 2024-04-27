@@ -18,7 +18,7 @@ export default function AddForm({setLoader, open, setOpen, setAlertInfo }) {
             setAlertInfo({open: true, color: 'success', message: res.data.message})
         })
         .catch((err) => {
-            setAlertInfo({open: true, color: 'error', message: err.response.data.unp[0]})
+            setAlertInfo({open: true, color: 'error', message: err.response.data.message})
         })
 
     }

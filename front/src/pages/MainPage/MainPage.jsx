@@ -14,13 +14,21 @@ import Carriers from '../Carriers/Carriers';
 import Reports from '../Reports/Reports';
 import Profile from '../Profile/Profile';
 import Archive from '../Archive/Archive';
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { api } from '../../api/api';
 import './main-page.css'
 
 
 export default function MainPage() {
     const [alertInfo, setAlertInfo] = useState({ open: false, color: '', message: '' });
     const [value, setValue] = useState('requests');
+    const [user, set_user] = useState()
+
+    useEffect(() => {
+        api('/auth/users_info/current_user/').then((res) => {
+            set_user(res.data)
+        })
+    }, [])
 
     return (
             <Grid container>
@@ -44,9 +52,10 @@ export default function MainPage() {
 
                         <BottomNavigationAction label="Перевозчики" className={value==='carriers' ? 'active_carriers' : 'carriers'}
                             value='carriers' icon={<LocalShippingRoundedIcon />} />
-
-                        <BottomNavigationAction label="Отчеты" className={value==='reports' ? 'active_reports' : 'reports'}
-                            value='reports' icon={<ArticleRoundedIcon />} />
+                        {user?.is_staff && 
+                            <BottomNavigationAction label="Отчеты" className={value==='reports' ? 'active_reports' : 'reports'}
+                                value='reports' icon={<ArticleRoundedIcon />} />
+                        }
 
                         <BottomNavigationAction label="Архив" className={value==='archive' ? 'active_archive' : 'archive'}
                             value='archive' icon={<ImportContactsIcon />} />

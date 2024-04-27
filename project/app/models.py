@@ -1,5 +1,6 @@
 from django.db import models
 from app.constants import CurrencyChoices, StatusRequestChoices
+from django.db.models import UniqueConstraint
 from django.contrib.auth.models import User
 
 class Request(models.Model):
@@ -42,14 +43,17 @@ class Client(models.Model):
     created_date = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     company_name = models.CharField(max_length=256, verbose_name='Название компании')
     contact_person = models.CharField(max_length=32, verbose_name='Контактное лицо')
-    unp = models.CharField(max_length=256, unique=True, verbose_name='УНП', 
-                           error_messages={'unique': 'Клиент с таким УНП уже существует.'})
+    unp = models.CharField(max_length=256, verbose_name='УНП')
     contact_info = models.CharField(max_length=256, verbose_name='Контактная информация')
     note = models.CharField(default='', verbose_name='Примечание')
 
     class Meta:
         verbose_name = 'Заказчики'
         verbose_name_plural = 'Заказчики'
+        constraints = [
+            UniqueConstraint(fields=['unp', 'contact_person'], name='unique_unp_contact_person', 
+                             violation_error_message='Клиент с таким УНП уже существует.')
+        ]
 
     def __str__(self):
         return f'{self.contact_person} | {self.company_name}'

@@ -20,13 +20,12 @@ export default function RequestCreate() {
     const { register, control, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
-    const [countries, setCountries] = useState()
-    const [cities, setCities] = useState()
+    const [countries, setCountries] = useState([])
+    const [cities, setCities] = useState([])
     const [valueCountry, setValueCountry] = useState()
     const [valueCity, setValueCity] = useState()
 
     const handleSave = (form_data) => {
-
         api(`/api/requests/`, 'POST', form_data)
             .then((res) => {
                 window.location.href = '/'
@@ -49,22 +48,19 @@ export default function RequestCreate() {
 
 
     useEffect(() => {
-
+        
         const timeoutId = setTimeout(() => {
-            if (!countries.includes(valueCountry)) {
+            if (valueCountry && !countries.includes(valueCountry)) {
                 setCountries([...countries, valueCountry])
             }
-        }, 1000);
+        }, 350);
         return () => clearTimeout(timeoutId);
-
-
 
     }, [valueCountry]);
 
     useEffect(() => {
-
         const timeoutId = setTimeout(() => {
-            if (!cities.includes(valueCity)) {
+            if (valueCity && !cities.includes(valueCity)) {
                 setCities([...cities, valueCity])
             }
         }, 350);
@@ -305,9 +301,7 @@ export default function RequestCreate() {
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
-
                                     <FormError error={errors?.country_of_dispatch} />
-
                                 </Grid>
 
                                 <Grid item xs={12} md={6} p={1}>
@@ -321,7 +315,6 @@ export default function RequestCreate() {
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
                                     />
-
                                     <FormError error={errors?.delivery_country} />
                                 </Grid>
 
@@ -336,7 +329,6 @@ export default function RequestCreate() {
                                         options={cities}
                                         renderInput={(params) => <TextField {...register('city_of_dispatch', { required: true })} {...params} label="Город отгрузки" />}
                                     />
-
                                     <FormError error={errors?.city_of_dispatch} />
                                 </Grid>
 
@@ -351,7 +343,6 @@ export default function RequestCreate() {
                                         options={cities}
                                         renderInput={(params) => <TextField {...register('delivery_city', { required: true })} {...params} label="Город доставки" />}
                                     />
-
                                     <FormError error={errors?.delivery_city} />
                                 </Grid>
 

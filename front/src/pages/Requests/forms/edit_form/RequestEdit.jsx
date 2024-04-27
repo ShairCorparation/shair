@@ -37,8 +37,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const [req, setReq] = React.useState()
     const [open, setOpen] = React.useState(false);
 
-    const [countries, setCountries] = React.useState()
-    const [cities, setCities] = React.useState()
+    const [countries, setCountries] = React.useState([])
+    const [cities, setCities] = React.useState([])
     const [valueCountry, setValueCountry] = React.useState()
     const [valueCity, setValueCity] = React.useState()
 
@@ -86,10 +86,10 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
 
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (!countries.includes(valueCountry)) {
+            if (valueCountry && !countries.includes(valueCountry)) {
                 setCountries([...countries, valueCountry])
             }
-        }, 1000);
+        }, 350);
         return () => clearTimeout(timeoutId);
 
     }, [valueCountry]);
@@ -97,7 +97,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
 
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (!cities.includes(valueCity)) {
+            if (valueCity && !cities.includes(valueCity)) {
                 setCities([...cities, valueCity])
             }
         }, 350);
