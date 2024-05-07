@@ -11,7 +11,7 @@ class ClientSerializer(serializers.ModelSerializer):
     count_request = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(client=instance.pk, status='complete').count()
+        return Request.objects.filter(client=instance.pk, status='on it').count()
 
     class Meta:
         model = Client
@@ -104,7 +104,6 @@ class ClientFinesSerializer(serializers.ModelSerializer):
     sum_fines = serializers.SerializerMethodField()
     sum_carrier_price = serializers.SerializerMethodField()
 
-
     def get_sum_carrier_price(self, instance):
         requests = Request.objects.filter(status='on it', payment_from_carrier=False, client=instance.id).only('carrier')
         total_sum = 0
@@ -147,7 +146,7 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
     consumption = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(client=instance.pk, status='complete').count()
+        return Request.objects.filter(client=instance.pk, status='on it').count()
 
     def get_fraht(self, instance):
         requests = Request.objects.filter(status='complete', client=instance.id).only('currency', 'customer_price')

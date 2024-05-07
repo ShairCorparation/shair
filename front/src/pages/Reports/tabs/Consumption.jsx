@@ -9,7 +9,7 @@ import axios from 'axios';
 export default function Consumption() {
     const initial_data = {
         request_id: '', unp: '', name_of_cargo: '',
-        request_date_from: '', request_date_up: ''
+        date_of_shipment: '', date_of_delivery: ''
     }
 
     const [filterData, setFilterData] = useState(initial_data)
@@ -27,8 +27,8 @@ export default function Consumption() {
             params: {
                 request_id: filterData.request_id,
                 name_of_cargo: filterData.name_of_cargo,
-                request_date_from: filterData.request_date_from,
-                request_date_up: filterData.request_date_up
+                date_of_shipment: filterData.date_of_shipment,
+                date_of_delivery: filterData.date_of_delivery
             }
         }).then((res) => {
             setCarriers(res.data)

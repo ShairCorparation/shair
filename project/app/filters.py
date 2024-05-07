@@ -3,7 +3,6 @@ import datetime as dt
 
 
 def client_filters(request, queryset):
-
     company_name = request.query_params.get('company_name')
     unp = request.query_params.get('unp')
     created_date_from = request.query_params.get('created_date_from')
@@ -12,8 +11,8 @@ def client_filters(request, queryset):
     duration_country_up = request.query_params.get('duration_country_up')
     duration_city_from = request.query_params.get('duration_city_from')
     duration_city_up = request.query_params.get('duration_city_up')
-    request_date_from = request.query_params.get('request_date_from')
-    request_date_up = request.query_params.get('request_date_up')
+    date_of_shipment = request.query_params.get('date_of_shipment')
+    date_of_delivery = request.query_params.get('date_of_delivery')
     delivery_date_from = request.query_params.get('delivery_date_from')
     delivery_date_up = request.query_params.get('delivery_date_up')
 
@@ -51,12 +50,12 @@ def client_filters(request, queryset):
         clients_id = Request.objects.filter(delivery_city=duration_city_up).values_list('client', flat=True)
         queryset = queryset.filter(pk__in=clients_id)
 
-    if request_date_from:
-        clients_id = Request.objects.filter(date_of_request__gte=dt.datetime.strptime(request_date_from, '%Y-%m-%d')).values_list('client', flat=True)
+    if date_of_shipment:
+        clients_id = Request.objects.filter(date_of_shipment__gte=dt.datetime.strptime(date_of_shipment, '%Y-%m-%d')).values_list('client', flat=True)
         queryset = queryset.filter(pk__in=clients_id)
 
-    if request_date_up:
-        clients_id = Request.objects.filter(date_of_request__lte=dt.datetime.strptime(request_date_up, '%Y-%m-%d')).values_list('client', flat=True)
+    if date_of_delivery:
+        clients_id = Request.objects.filter(date_of_delivery__lte=dt.datetime.strptime(date_of_delivery, '%Y-%m-%d')).values_list('client', flat=True)
         queryset = queryset.filter(pk__in=clients_id)
 
     if delivery_date_from:
@@ -89,7 +88,6 @@ def client_filters(request, queryset):
 
 def carrier_filters(request):
     queryset = Carrier.objects.all().order_by('company_name')
-
     company_name = request.query_params.get('company_name')
     unp = request.query_params.get('unp')
     created_date_from = request.query_params.get('created_date_from')
@@ -98,8 +96,8 @@ def carrier_filters(request):
     duration_country_up = request.query_params.get('duration_country_up')
     duration_city_from = request.query_params.get('duration_city_from')
     duration_city_up = request.query_params.get('duration_city_up')
-    request_date_from = request.query_params.get('request_date_from')
-    request_date_up = request.query_params.get('request_date_up')
+    date_of_shipment = request.query_params.get('date_of_shipment')
+    date_of_delivery = request.query_params.get('date_of_delivery')
 
     name_of_cargo = request.query_params.get('name_of_cargo')
     request_id = request.query_params.get('request_id')
@@ -134,12 +132,12 @@ def carrier_filters(request):
         carriers_id = Request.objects.filter(delivery_city=duration_city_up).values_list('carrier', flat=True)
         queryset = queryset.filter(pk__in=carriers_id)
 
-    if request_date_from:
-        carriers_id = Request.objects.filter(date_of_request__gte=dt.datetime.strptime(request_date_from, '%Y-%m-%d')).values_list('carrier', flat=True)
+    if date_of_shipment:
+        carriers_id = Request.objects.filter(date_of_shipment__gte=dt.datetime.strptime(date_of_shipment, '%Y-%m-%d')).values_list('carrier', flat=True)
         queryset = queryset.filter(pk__in=carriers_id)
 
-    if request_date_up:
-        carriers_id = Request.objects.filter(date_of_request__lte=dt.datetime.strptime(request_date_up, '%Y-%m-%d')).values_list('carrier', flat=True)
+    if date_of_delivery:
+        carriers_id = Request.objects.filter(date_of_delivery__lte=dt.datetime.strptime(date_of_delivery, '%Y-%m-%d')).values_list('carrier', flat=True)
         queryset = queryset.filter(pk__in=carriers_id)
 
     # report filters

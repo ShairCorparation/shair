@@ -9,7 +9,7 @@ export default function Overcomes() {
     const initial_data = {
         request_id: '', company_name: '',
         duration_country_from: '', duration_city_from: '', duration_country_up: '', duration_city_up: '',
-        request_date_from: '', request_date_up: '', executor: 0
+        date_of_shipment: '', date_of_delivery: '', executor: 0
     }
 
     const [filterData, setFilterData] = useState(initial_data)
@@ -43,8 +43,8 @@ export default function Overcomes() {
                     duration_city_from: filterData.duration_city_from,
                     duration_country_up: filterData.duration_country_up,
                     duration_city_up: filterData.duration_city_up,
-                    request_date_from: filterData.request_date_from,
-                    request_date_up: filterData.request_date_up,
+                    date_of_shipment: filterData.date_of_shipment,
+                    date_of_delivery: filterData.date_of_delivery,
                 }
             }
         ).then((res) => {

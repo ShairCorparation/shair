@@ -70,7 +70,7 @@ class ClientViewSet(
     @action(detail=False, methods=['GET'])
     def overcomes(self, request, *args, **kwargs):
         currency_data = get_currencies()
-        clients_id = Request.objects.filter(status='complete').values_list('client', flat=True)
+        clients_id = Request.objects.filter(status='on it').values_list('client', flat=True)
         serializer = ClientOvercomesSerializer(self.get_queryset().filter(pk__in=clients_id), many=True, context=currency_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -192,20 +192,20 @@ class CarrierViewSet(
 
     @action(detail=True, methods=['GET'])
     def by_request(self, request, pk, *args, **kwargs):
-        queryset = self.get_queryset().filter(request_id=pk)
+        queryset = self.get_queryset().filter(request_id__executor__pk=self.request.user.pk)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
     def overcomes(self, request, *args, **kwargs):
-        carriers_id = Request.objects.filter(status='complete').values_list('carrier', flat=True)
+        carriers_id = Request.objects.filter(status='on it').values_list('carrier', flat=True)
         queryset = Carrier.objects.filter(pk__in=carriers_id)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
     def consumption(self, request, *args, **kwargs):
-        carriers_id = Request.objects.filter(status='complete').values_list('carrier', flat=True)
+        carriers_id = Request.objects.filter(status='on it').values_list('carrier', flat=True)
         queryset = self.get_queryset().filter(pk__in=carriers_id)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -239,7 +239,6 @@ class DocsRequestsViewSet(
         doc = get_object_or_404(Docs, pk=pk)
         doc.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
         
 @api_view()

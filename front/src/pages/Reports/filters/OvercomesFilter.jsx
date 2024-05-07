@@ -133,7 +133,7 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                 <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
                     <IconButton aria-label="delete"
                         onClick={() => {
-                            setFilterData({ ...filterData, request_date_from: '', request_date_up: '' })
+                            setFilterData({ ...filterData, date_of_shipment: '', date_of_delivery: '' })
                             setSendFilter(!sendFilter)
                         }}
                     >
@@ -143,22 +143,22 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                 </Grid>
 
                 <Grid item alignItems='center' className='input_date_container' justifyContent='center' p={1} ml={1}>
-                    <span>Дата запроса От: </span>
+                    <span>Дата загрузки: </span>
                     <LocalizationProvider dateAdapter={AdapterDayjs}
                         localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
                         <DatePicker
-                            value={filterData.request_date_from !== '' ? filterData.request_date_from : null}
+                            value={filterData.date_of_shipment !== '' ? filterData.date_of_shipment : null}
                             className='date_picker'
-                            onChange={(value) => setFilterData({ ...filterData, request_date_from: value.format('YYYY-MM-DD') })}
+                            onChange={(value) => setFilterData({ ...filterData, date_of_shipment: value.format('YYYY-MM-DD') })}
                         />
                     </LocalizationProvider>
-                    <span>До: </span>
+                    <span>Дата доставки: </span>
                     <LocalizationProvider dateAdapter={AdapterDayjs}
                         localeText={ruRU.components.MuiLocalizationProvider.defaultProps.localeText}>
                         <DatePicker
-                            value={filterData.request_date_up !== '' ? filterData.request_date_up : null}
+                            value={filterData.date_of_delivery !== '' ? filterData.date_of_delivery : null}
                             className='date_picker'
-                            onChange={(value) => setFilterData({ ...filterData, request_date_up: value.format('YYYY-MM-DD') })}
+                            onChange={(value) => setFilterData({ ...filterData, date_of_delivery: value.format('YYYY-MM-DD') })}
                         />
                     </LocalizationProvider>
                 </Grid>
