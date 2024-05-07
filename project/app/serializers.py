@@ -109,9 +109,9 @@ class ClientFinesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            if request.currency == 'RUB':
+            if request.carrier.currency == 'RUB':
                 converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
-            elif request.currency == 'BYN':
+            elif request.carrier.currency == 'BYN':
                 converted_price = request.carrier.rate
             else:
                 converted_price = request.carrier.rate * self.context[request.carrier.currency]
