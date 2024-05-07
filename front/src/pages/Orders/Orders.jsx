@@ -78,6 +78,7 @@ export default function Orders() {
         currency === 'USD' && (res = amount * USD)
         currency === 'EUR' && (res = amount * EUR)
         currency === 'RUB' && (res = amount * RUB / 100)
+        currency === 'BYN' && (res = amount)
         return res.toFixed(2);
       };
 
