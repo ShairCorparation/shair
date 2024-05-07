@@ -81,7 +81,7 @@ export default function Requests({ setAlertInfo }) {
                                 <TableCell align="left">{req.date_of_shipment}</TableCell>
                                 <TableCell align="left">{req.date_of_delivery}</TableCell>
                                 <TableCell align="left">
-                                    {req.client.contact_person}
+                                    {req.client.company_name}
                                     <br />
                                     {req.client.contact_info}
                                 </TableCell>

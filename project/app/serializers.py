@@ -110,6 +110,8 @@ class ClientFinesSerializer(serializers.ModelSerializer):
         for request in requests:
             if request.currency == 'RUB':
                 converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            elif request.currency == 'BYN':
+                converted_price = request.carrier.rate
             else:
                 converted_price = request.carrier.rate * self.context[request.carrier.currency]
             total_sum += converted_price 
@@ -124,6 +126,8 @@ class ClientFinesSerializer(serializers.ModelSerializer):
         for request in requests:
             if request.currency == 'RUB':
                 converted_price = request.customer_price * self.context[request.currency] / 100
+            elif request.currency == 'BYN':
+                converted_price = request.customer_price
             else:
                 converted_price = request.customer_price * self.context[request.currency]   
             total_sum += converted_price
@@ -148,7 +152,12 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            converted_price = request.customer_price * self.context[request.currency]
+            if request.currency == 'RUB':
+                converted_price = request.customer_price * self.context[request.currency] / 100
+            elif request.currency == 'BYN':
+                converted_price = request.customer_price
+            else:
+                converted_price = request.customer_price * self.context[request.currency]
             total_sum += converted_price
  
         return(round(total_sum, 2))
@@ -160,6 +169,8 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
         for request in requests:
             if request.carrier.currency == 'RUB':
                 converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            elif request.carrier.currency == 'BYN':
+                converted_price = request.carrier.rate
             else :
                 converted_price = request.carrier.rate * self.context[request.carrier.currency]
             total_sum += converted_price

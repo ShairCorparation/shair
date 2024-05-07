@@ -93,7 +93,7 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                                                 setCarrierId(carrier.id)
                                                 }}
                                         >
-                                            {carrier.contact_person}, {carrier.contact_info}
+                                            {carrier.company_name}, {carrier.unp}
                                         </MenuItem>
                                     ))}
 

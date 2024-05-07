@@ -108,7 +108,7 @@ export default function Orders() {
                                 <TableCell component="th" scope="row">#{req.id}</TableCell>
                                 <TableCell align="left">{req.date_of_request}</TableCell>
                                 <TableCell align="left">
-                                    {req.client.contact_person}
+                                    {req.client.company_name}
                                     <br />
                                     {req.client.contact_info}
                                 </TableCell>
@@ -130,7 +130,7 @@ export default function Orders() {
                                     {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.rate, req.carrier.currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
-                                    {req.carrier.contact_person}
+                                    {req.carrier.company_name}
                                     <br />
                                     {req.carrier.contact_info}
                                 </TableCell>
