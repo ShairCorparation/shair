@@ -73,6 +73,8 @@ class RequestListSerializer(serializers.ModelSerializer):
 
         if instance.currency == 'RUB':
             representation['customer_price'] = round(instance.customer_price * self.context[instance.currency] / 100, 2)
+        elif instance.currency == 'BYN':
+            representation['customer_price'] = round(instance.customer_price, 2)
         else:
             representation['customer_price'] = round(instance.customer_price * self.context[instance.currency], 2)
         representation['client'] = ClientSerializer(instance.client).data
