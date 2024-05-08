@@ -12,7 +12,7 @@ export default function EditForm({ open, setOpen, carrier, setAlertInfo, setLoad
     const [carrierInfo, setCarrierInfo] = React.useState(null)
 
     const handleSave = (form_date) => {
-        api(`/api/carriers/${carrier}/`, 'PATCH', form_date).then((res) => {
+        api(`/api/carriers/${carrier?.id}/`, 'PATCH', form_date).then((res) => {
             setAlertInfo({ open: true, color: 'success', message: res.data.message })
             setLoader(true)
         })

@@ -45,7 +45,7 @@ class Client(models.Model):
     contact_person = models.CharField(max_length=32, verbose_name='Контактное лицо')
     unp = models.CharField(max_length=256, verbose_name='УНП')
     contact_info = models.CharField(max_length=256, verbose_name='Контактная информация')
-    note = models.CharField(default='', verbose_name='Примечание')
+    note = models.CharField(blank=True, verbose_name='Примечание')
 
     class Meta:
         verbose_name = 'Заказчики'
@@ -68,7 +68,7 @@ class Carrier(models.Model):
     contact_info = models.CharField(max_length=256, verbose_name='Контактная информация')
     rate = models.PositiveBigIntegerField(blank=True, verbose_name='Ставка')
     currency = models.CharField(choices=CurrencyChoices, verbose_name='Валюта')
-    note = models.CharField(default='', verbose_name='Примечание')
+    note = models.CharField(blank=True, verbose_name='Примечание')
 
     request_id = models.ForeignKey(Request, on_delete=models.CASCADE, null=True, related_name='carriers', verbose_name='Запрос')
     
