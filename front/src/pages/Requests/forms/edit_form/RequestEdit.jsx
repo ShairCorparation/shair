@@ -29,7 +29,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 
 export default function RequestEdit({ request, openDialog, setOpenDialog, point = '', setLoader, setCurrentReq }) {
-    const { register, control, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
+    const { register, trigger, control, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
 
     const [clients, setClients] = React.useState(null)
@@ -80,7 +80,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             setValue('delivery_city', res.data.delivery_city)
         })
         if (point !== '') {
-            api(`/api/carriers/${request.id}/by_request/`, 'GET').then((res) => { setCarriers(res.data) })
+            api(`/api/request_carriers/`, 'GET', {}, false, {params: {'request_id': request.id}}).then((res) => { setCarriers(res.data) })
         }
     }, [])
 
@@ -151,21 +151,31 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                 </Grid>
                                                 <Grid container item xs={12} md={6} p={1}>
                                                     <Grid item xs={10}>
-                                                        <FormControl sx={{ width: '100%' }} size='small'>
-                                                            <InputLabel id="demo-simple-select-label">Клиент</InputLabel>
-                                                            <Select
-                                                                labelId="demo-simple-select-label"
-                                                                id="demo-simple-select"
-                                                                label="Клиент"
-                                                                defaultValue={req.client.id}
-                                                                {...register('client', { required: true })}
-                                                            >
-                                                                <MenuItem value={req.client.id}>{req.client.name}</MenuItem>
-                                                                {clients && clients.map((client) => (
-                                                                    <MenuItem value={client.id}>{client.company_name}</MenuItem>
-                                                                ))}
-                                                            </Select>
-                                                        </FormControl>
+
+                                                        <Controller
+                                                            control={control}
+                                                            name={'client'}
+                                                            defaultValue={req.client.id}
+                                                            rules={{ required: true }}
+                                                            render={({ field: { onChange, value } }) => (
+                                                                <Autocomplete
+                                                                    id="multiple-limit-tags"
+                                                                    size="small"
+                                                                    options={clients}
+                                                                    onChange={(e, v) => {
+                                                                        setValue('client', v.id)
+                                                                        trigger('client')
+                                                                    }}
+                                                                    defaultValue={req.client}
+                                                                    getOptionLabel={(option) => option.company_name}
+                                                                    renderInput={(params) => (
+                                                                        <TextField {...params} className='tab_text_field' label='Клиент' />
+                                                                    )}
+                                                                    sx={{ width: 'auto' }}
+                                                                />
+                                                            )}
+                                                        />
+
                                                         <FormError error={errors?.client} />
                                                     </Grid>
                                                     <Grid item xs={2} align='end'>
@@ -375,6 +385,10 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             fullWidth
                                                             size='small'
                                                             defaultValue={req.country_of_dispatch}
+                                                            onChange={(e, v) => {
+                                                                setValue('country_of_dispatch', v)
+                                                                trigger('country_of_dispatch')
+                                                            }}
                                                             options={countries}
                                                             getOptionLabel={(option) => option}
                                                             renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
@@ -390,6 +404,10 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             fullWidth
                                                             size='small'
                                                             defaultValue={req.delivery_country}
+                                                            onChange={(e, v) => {
+                                                                setValue('delivery_country', v)
+                                                                trigger('delivery_country')
+                                                            }}
                                                             options={countries}
                                                             getOptionLabel={(option) => option}
                                                             renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
@@ -408,6 +426,10 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             id="combo-box-demo"
                                                             fullWidth
                                                             size='small'
+                                                            onChange={(e, v) => {
+                                                                setValue('city_of_dispatch', v)
+                                                                trigger('city_of_dispatch')
+                                                            }}
                                                             defaultValue={req.city_of_dispatch}
                                                             options={cities}
                                                             getOptionLabel={(option) => option}
@@ -425,6 +447,10 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             fullWidth
                                                             size='small'
                                                             defaultValue={req.delivery_city}
+                                                            onChange={(e, v) => {
+                                                                setValue('delivery_city', v)
+                                                                trigger('delivery_city')
+                                                            }}
                                                             options={cities}
                                                             getOptionLabel={(option) => option}
                                                             renderInput={(params) => <TextField {...register('delivery_city', { required: true })} {...params} label="Город доставки" />}
@@ -469,7 +495,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                             {...register('carrier', { required: true })}
                                                         >
                                                             {carriers?.map((carrier) => (
-                                                                <MenuItem value={carrier.id}>{carrier.contact_person}, {carrier.contact_info}</MenuItem>
+                                                                <MenuItem value={carrier.id}>{carrier.company_name}, {carrier.contact_person}</MenuItem>
                                                             ))}
 
                                                         </Select>

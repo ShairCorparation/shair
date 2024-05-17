@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-    Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Checkbox, Tooltip
+    Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Checkbox, Tooltip, Grid
 } from '@mui/material'
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ErrorMessage from '../../components/ErrorMesage/ErrorMesage'
@@ -16,6 +16,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RequestEdit from '../Requests/forms/edit_form/RequestEdit';
 import DocForm from './forms/docs_dialog/doc_form'
 import CompleteOrder from './forms/complete_dialog/complete_dialog';
+import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
 import { useEffect } from 'react'
 import { api } from '../../api/api'
 import axios from 'axios';
@@ -30,6 +31,8 @@ export default function Orders() {
     const [changeDesc, setChangeDesc] = React.useState(false)
     const [editDialog, setEditDialog] = React.useState(false)
     const [curr_req, setCureReq] = React.useState(null)
+    const [userInfo, setUserInfo] = React.useState(null)
+    const [executor, setExecutor] = React.useState(0)
 
     const [EUR, setEUR] = React.useState(0)
     const [USD, setUSD] = React.useState(0)
@@ -57,7 +60,19 @@ export default function Orders() {
             setLoader(false)
         })
 
+        api('/auth/users_info/current_user/').then((res) => {
+            setUserInfo(res.data)
+        })
+
     }, [loader])
+
+    React.useEffect(() => {
+        api('/api/requests/on_it/', 'GET', {}, false, {
+            params: {
+                'executor': executor
+            }
+        }).then(res => setRequests(res.data))
+    }, [executor])
 
     function clientPayment(value, req_id) {
         api(`/api/requests/${req_id}/`, 'PATCH', { payment_from_client: value }).then((res) => {
@@ -80,10 +95,15 @@ export default function Orders() {
         currency === 'RUB' && (res = amount * RUB / 100)
         currency === 'BYN' && (res = amount)
         return res.toFixed(2);
-      };
+    };
 
     return (
         <React.Fragment>
+            {userInfo?.is_staff &&
+                <Grid container xs={12} p={2} justifyContent={'center'}>
+                    <ExecutorFilter setExecutor={setExecutor} executor={executor} />
+                </Grid>
+            }
 
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
@@ -128,12 +148,12 @@ export default function Orders() {
                                     {Number(convertCurrency(req.customer_price, req.currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
-                                    {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.rate, req.carrier.currency)).toFixed(2)} BYN
+                                    {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.carrier_rate, req.carrier.carrier_currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
                                     {req.carrier.company_name}
                                     <br />
-                                    {req.carrier.contact_info}
+                                    {req.carrier.contact_person}
                                 </TableCell>
                                 <TableCell align='center'>
                                     <Button variant='contained' color='primary'
@@ -223,7 +243,7 @@ export default function Orders() {
                     <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} />
                     <DeleteRequest open={deleteRequest} setOpen={setDeleteRequest} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} point={'orders'} setCurrentReq={setCureReq} />
                     <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={curr_req} point={'orders'} setLoader={setLoader} setCurrentReq={setCureReq} />
-                    <CompleteOrder open={complete_dialog} setOpen={setCompleteDialog} request={curr_req} setLoader={setLoader} setCurrentReq={setCureReq} setAlertInfo={setAlertInfo}/>
+                    <CompleteOrder open={complete_dialog} setOpen={setCompleteDialog} request={curr_req} setLoader={setLoader} setCurrentReq={setCureReq} setAlertInfo={setAlertInfo} />
                 </React.Fragment>
             }
 

@@ -15,7 +15,6 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
     const [carriers, setCarriers] = useState(null)
     const [rate, setRate] = useState(0)
     const [currency, setCurrency] = useState('')
-    const [carrier_id, setCarrierId] = useState(0)
     const [loadCarrier, setLoaderCarrier] = useState(false)
 
     const handleClose = () => {
@@ -23,27 +22,14 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
         setCurrentReq(null)
     };
 
-    const handleChange = (value, field) => {
-        let data = {}
-        
-        if (field === 'rate') {
-            setRate(value)
-            data = {'rate': value !== '' ? value : 0}
-        }
-
-        if (field === 'currency') {
-            setCurrency(value)
-            data = {'currency': value}
-        }
-
-        api(`/api/carriers/${carrier_id}/`, 'PATCH', data)
-        setLoaderCarrier(true)
-        
-    }
 
     const handleSave = (form_data) => {
-        const data = { carrier: form_data.carrier, status: 'on it', 
-                    currency: form_data.currency, customer_price: form_data.customer_price }
+
+        api(`/api/request_carriers/${form_data.carrier}/`, 'PATCH', {
+            'carrier_rate': rate,
+            'carrier_currency': currency
+        })
+        const data = { carrier: form_data.carrier, status: 'on it'}
         api(`/api/requests/${currentReq.id}/take_to_job/`, 'PATCH', data)
             .then((res) => {
                 setAlertInfo({ open: open, color: 'success', message: res.data.message })
@@ -51,14 +37,15 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                 handleClose()
             })
             .catch((err) => {
+                console.log(err)
                 setAlertInfo({ open: open, color: 'error', message: err.response.data.unp[0] })
             })
     }
 
     useEffect(() => {
-        api(`/api/carriers/${currentReq.id}/by_request/`, 'GET').then((res) => { setCarriers(res.data) })
+        setCarriers(currentReq.carrier_list) 
         setLoaderCarrier(false)
-    }, [loadCarrier])
+    }, [loadCarrier, currentReq])
 
     return (
         <Dialog
@@ -88,12 +75,11 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                                     {carriers && carriers.map((carrier) => (
                                         <MenuItem value={carrier.id}
                                             onClick={()=> {
-                                                setRate(carrier.rate)
-                                                setCurrency(carrier.currency)
-                                                setCarrierId(carrier.id)
+                                                setRate(carrier.carrier_rate)
+                                                setCurrency(carrier.carrier_currency)
                                                 }}
                                         >
-                                            {carrier.company_name}, {carrier.unp}
+                                            {carrier.company_name}, {carrier.contact_person}
                                         </MenuItem>
                                     ))}
 
@@ -108,26 +94,23 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                                 fullWidth
                                 label="Итого лучшая ставка"
                                 placeholder="Итого лучшая ставка"
-                                
                                 value={rate}
-                                onChange={(e) => {handleChange(e.target.value, 'rate')}}
+                                onChange={(e) => {setRate(e.target.value)}}
                             />
 
                         </Grid>
 
-                        
-
                         <Grid item xs={12} md={6} pt={1} align='end'>
                             <FormControl sx={{ width: '99%' }} size="small">
-                                <InputLabel id="demo-simple-select-label">Currency</InputLabel>
+                                <InputLabel id="demo-simple-select-label">Валюта</InputLabel>
                                 
                                         <Select 
                                             className="select_field_edit_page"
                                             labelId="demo-simple-select-label"
                                             id="demo-simple-select"
-                                            label="Currency"
+                                            label="Валюта"
                                             value={currency}
-                                            onChange={(value) => {handleChange(value.target.value, 'currency')}}
+                                            onChange={(value) => {setCurrency(value.target.value)}}
                                         >
                                             <MenuItem value={'USD'}>USD</MenuItem>
                                             <MenuItem value={'EUR'}>EUR</MenuItem>

@@ -1,7 +1,6 @@
-from app.models import Client, Request, Carrier, Docs
+from app.models import Client, Request, Carrier, Docs, RequestCarrier
 from rest_framework import serializers
 from project.settings.django_environ import env
-from django.db.models import Sum, F
 
 URL = env('BACKEND_URL')
 FILE_STORAGE = env('FILE_STORAGE')
@@ -22,12 +21,12 @@ class CarrierSerializer(serializers.ModelSerializer):
     count_request = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(status='complete').filter(carrier__pk=instance.pk).count()
+        return Request.objects.filter(status='on it').filter(carrier__pk=instance.pk).count()
 
 
     class Meta:
         model = Carrier
-        fields = ['id', 'company_name', 'contact_person', 'unp', 'contact_info', 'count_request', 'note', 'rate', 'currency', 'request_id']
+        fields = ['id', 'company_name', 'contact_person', 'unp', 'contact_info', 'count_request', 'note', 'rate', 'currency']
 
 
 class DocsRequestSerializer(serializers.ModelSerializer):
@@ -42,13 +41,28 @@ class DocsRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Docs
         fields = '__all__'
+        
+class RequestCarriersSerializer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+    contact_person = serializers.SerializerMethodField()
+    
+    def get_company_name(self, instance):
+        return Carrier.objects.get(pk=instance.carrier_id.pk).company_name
+    
+    def get_contact_person(self, instance):
+        return Carrier.objects.get(pk=instance.carrier_id.pk).contact_person
+    
+    class Meta:
+        model = RequestCarrier
+        fields = '__all__'
 
 
 class RequestSerializer(serializers.ModelSerializer):
     carrier_list = serializers.SerializerMethodField()
 
     def get_carrier_list(self, instance):
-        return CarrierSerializer(Carrier.objects.filter(request_id=instance.id), many=True).data
+        return RequestCarriersSerializer(RequestCarrier.objects.filter(request_id=instance.id), many=True).data
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -56,7 +70,7 @@ class RequestSerializer(serializers.ModelSerializer):
         representation['client'] = ClientSerializer(instance.client).data
         representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
         return representation
-
+    
     class Meta:
         model = Request
         fields = '__all__'
@@ -66,7 +80,7 @@ class RequestListSerializer(serializers.ModelSerializer):
     carrier_list = serializers.SerializerMethodField()
 
     def get_carrier_list(self, instance):
-        return CarrierSerializer(Carrier.objects.filter(request_id=instance.id), many=True).data
+        return RequestCarriersSerializer(RequestCarrier.objects.filter(request_id=instance.id), many=True).data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -91,7 +105,7 @@ class OrdersSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['client'] = ClientSerializer(instance.client).data
-        representation['carrier'] = CarrierSerializer(instance.carrier).data
+        representation['carrier'] = RequestCarriersSerializer(instance.carrier).data
         representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
         return representation
 
@@ -109,12 +123,12 @@ class ClientFinesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            if request.carrier.currency == 'RUB':
-                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
-            elif request.carrier.currency == 'BYN':
-                converted_price = request.carrier.rate
+            if request.carrier.carrier_currency == 'RUB':
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency] / 100
+            elif request.carrier.carrier_currency == 'BYN':
+                converted_price = request.carrier.carrier_rate
             else:
-                converted_price = request.carrier.rate * self.context[request.carrier.currency]
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency]
             total_sum += converted_price 
             
         return(round(total_sum, 2))
@@ -149,7 +163,7 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
         return Request.objects.filter(client=instance.pk, status='on it').count()
 
     def get_fraht(self, instance):
-        requests = Request.objects.filter(status='complete', client=instance.id).only('currency', 'customer_price')
+        requests = Request.objects.filter(status='on it', client=instance.id).only('currency', 'customer_price')
         total_sum = 0
 
         for request in requests:
@@ -164,16 +178,16 @@ class ClientOvercomesSerializer(serializers.ModelSerializer):
         return(round(total_sum, 2))
     
     def get_consumption(self, instance):
-        requests = Request.objects.filter(status='complete', client=instance.id).only('currency', 'customer_price')
+        requests = Request.objects.filter(status='on it', client=instance.id).only('currency', 'customer_price')
         total_sum = 0
 
         for request in requests:
-            if request.carrier.currency == 'RUB':
-                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
-            elif request.carrier.currency == 'BYN':
-                converted_price = request.carrier.rate
+            if request.carrier.carrier_currency == 'RUB':
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency] / 100
+            elif request.carrier.carrier_currency == 'BYN':
+                converted_price = request.carrier.carrier_rate
             else :
-                converted_price = request.carrier.rate * self.context[request.carrier.currency]
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency]
             total_sum += converted_price
 
         return(round(total_sum, 2))
@@ -189,5 +203,10 @@ class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = ['country_of_dispatch', 'city_of_dispatch', 'delivery_country', 'delivery_city']
+        
+
+        
+        
+
 
 

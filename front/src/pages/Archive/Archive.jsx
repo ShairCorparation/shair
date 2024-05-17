@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-    Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Checkbox, Tooltip
+    Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, IconButton, Checkbox, Tooltip, Grid
 } from '@mui/material'
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ErrorMessage from '../../components/ErrorMesage/ErrorMesage'
@@ -10,6 +10,7 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DocForm from '../Orders/forms/docs_dialog/doc_form';
 import ChangeDesc from '../Requests/forms/change_desc/ChangeDesc';
+import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
 import { useEffect } from 'react'
 import { api } from '../../api/api'
 import axios from 'axios';
@@ -21,6 +22,9 @@ export default function Archive() {
     const [doc_dialog, setDocDialog] = React.useState(false)
     const [changeDesc, setChangeDesc] = React.useState(false)
     const [curr_req, setCureReq] = React.useState(null)
+
+    const [executor, setExecutor] = React.useState(0)
+    const [userInfo, setUserInfo] = React.useState(null)
 
     const [EUR, setEUR] = React.useState(0)
     const [USD, setUSD] = React.useState(0)
@@ -39,8 +43,11 @@ export default function Archive() {
         loadCurrency('USD')
         loadCurrency('RUB')
 
-    }, [])
+        api('/auth/users_info/current_user/').then((res) => {
+            setUserInfo(res.data)
+        })
 
+    }, [])
 
     useEffect(() => {
         api(`/api/requests/archived/`, 'GET').then((res) => {
@@ -50,17 +57,32 @@ export default function Archive() {
 
     }, [loader])
 
+    useEffect(() => {
+        api('/api/requests/archived/', 'GET', {}, false, {
+            params: {
+                'executor': executor
+            }
+        }).then(res => setRequests(res.data))
+    }, [executor])
+
 
     const convertCurrency = (amount, currency) => {
         let res
         currency === 'USD' && (res = amount * USD)
         currency === 'EUR' && (res = amount * EUR)
         currency === 'RUB' && (res = amount * RUB / 100)
+        currency === 'BYN' && (res = amount)
         return res;
-      };
+    };
 
     return (
         <React.Fragment>
+
+            {userInfo?.is_staff &&
+                <Grid container xs={12} p={2} justifyContent={'center'}>
+                    <ExecutorFilter setExecutor={setExecutor} executor={executor} />
+                </Grid>
+            }
 
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
@@ -105,7 +127,7 @@ export default function Archive() {
                                     {Number(convertCurrency(req.customer_price, req.currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
-                                    {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.rate, req.carrier.currency)).toFixed(2)} BYN
+                                    {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.carrier_rate, req.carrier.carrier_currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
                                     {req.carrier.contact_person}
@@ -160,8 +182,8 @@ export default function Archive() {
 
             {curr_req &&
                 <React.Fragment>
-                    <DocForm doc_dialog={doc_dialog} setDocDialog={setDocDialog} curr_req={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'}/>
-                    <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'}/>
+                    <DocForm doc_dialog={doc_dialog} setDocDialog={setDocDialog} curr_req={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
+                    <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
                 </React.Fragment>
             }
 

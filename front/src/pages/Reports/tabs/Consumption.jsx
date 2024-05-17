@@ -23,7 +23,7 @@ export default function Consumption() {
     const [carriers, setCarriers] = useState(null)
 
     useEffect(() => {
-        api('/api/carriers/consumption/', 'GET', {}, false, {
+        api('/api/request_carriers/consumption/', 'GET', {}, false, {
             params: {
                 request_id: filterData.request_id,
                 name_of_cargo: filterData.name_of_cargo,
@@ -37,7 +37,7 @@ export default function Consumption() {
 
 
     useEffect(() => {
-        api('/api/carriers/consumption/').then((res) => {
+        api('/api/request_carriers/consumption/').then((res) => {
             setCarriers(res.data)
         })
 
@@ -91,7 +91,7 @@ export default function Consumption() {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell align="left" component="th" scope="row">{carrier?.company_name}</TableCell>
-                                    <TableCell align="left">{convertCurrency(carrier?.rate, carrier?.currency)} BYN</TableCell>
+                                    <TableCell align="left">{convertCurrency(carrier?.carrier_rate, carrier?.carrier_currency)} BYN</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

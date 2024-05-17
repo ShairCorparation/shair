@@ -47,7 +47,10 @@ export default function Fines() {
                         executor: filterData.executor
                     }
                 }
-            ).then((res) => setClients(res.data))
+            ).then((res) => {
+                setClients(res.data)
+                console.log(res.data)
+            })
         }
 
     }, [sendFilter])

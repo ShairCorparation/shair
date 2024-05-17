@@ -35,7 +35,7 @@ export default function Profile() {
                 </Grid>
             </Grid>
             <ChangePassword setAlertInfo={setAlertInfo} />
-            {user?.is_staff && <AddNewUser setAlertInfo={setAlertInfo} />}
+            {user?.is_staff && <AddNewUser setAlertInfo={setAlertInfo} currentUser={user}/>}
 
 
             <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />

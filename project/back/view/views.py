@@ -4,7 +4,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
 from rest_framework.viewsets import mixins, GenericViewSet
 from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import action
@@ -12,7 +11,8 @@ from rest_framework.generics import get_object_or_404
 from app.helpers import get_currencies
 from back.filters import user_filters
 from app.models import Request
-from back import serializers
+from back import serializers, models
+from django.contrib.auth.models import User
 
 
 class UserRegistrationAPIView(GenericAPIView):
@@ -72,6 +72,7 @@ class UserLogoutAPIView(GenericAPIView):
 class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSet):
 
     serializer_class = serializers.CustomUserSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         return user_filters(self.request, User.objects.all())
@@ -101,7 +102,8 @@ class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSe
     @action(detail=False, methods=['GET'])
     def overcomes(self, request, *args, **kwargs):
         currency_data = get_currencies()
-        executors_id = Request.objects.filter(status='complete').values_list('executor', flat=True)
+        executors_id = Request.objects.filter(status='on it').values_list('executor', flat=True)
+        print(executors_id)
         serializer = serializers.OvercomesUserSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -112,3 +114,21 @@ class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSe
         serializer = serializers.ExecutorFinesSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class ProfileViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet):
+    
+    serializer_class = serializers.ProfileSerializer
+    permission_classes = (IsAuthenticated,)
+    queryset = models.Profile.objects.all()
+    
+    def list(self, request, *args, **kwargs):
+        instance = self.queryset.get(user_id=request.query_params['user_id'])
+        serializer = self.serializer_class(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def update(self, request, pk, *args, **kwargs):
+        instance = get_object_or_404(models.Profile, user_id=pk)
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(status=status.HTTP_200_OK)

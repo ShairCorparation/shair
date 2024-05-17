@@ -1,4 +1,4 @@
-import { Box, Grid, BottomNavigation, BottomNavigationAction } from '@mui/material'
+import { Box, Grid, BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui/material'
 import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import HandshakeRoundedIcon from '@mui/icons-material/HandshakeRounded';
@@ -23,14 +23,26 @@ export default function MainPage() {
     const [alertInfo, setAlertInfo] = useState({ open: false, color: '', message: '' });
     const [value, setValue] = useState('requests');
     const [user, set_user] = useState()
+    const [loader, setLoader] = useState(true)
+
 
     useEffect(() => {
-        api('/auth/users_info/current_user/').then((res) => {
-            set_user(res.data)
-        })
+        async function get_current_user() {
+            await api('/auth/users_info/current_user/').then((res) => {
+                set_user(res.data)
+                setLoader(false)
+            })
+        }
+        get_current_user()
+             
     }, [])
 
     return (
+        loader ?
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh !important' }}>
+                <CircularProgress />
+            </Box>
+            :
             <Grid container>
                 <Box sx={{ width: '-webkit-fill-available' }} >
                     <BottomNavigation

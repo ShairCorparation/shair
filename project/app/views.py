@@ -1,18 +1,19 @@
 from django.shortcuts import render
-from app.models import Carrier, Client, Request, Docs, Currency
+from app.models import Carrier, Client, Request, Docs, RequestCarrier
 from app.serializers import ClientSerializer, RequestSerializer, CarrierSerializer, \
         OrdersSerializer, DocsRequestSerializer, ClientFinesSerializer, ClientOvercomesSerializer, RequestListSerializer, \
-        CountriesSerializer
+        RequestCarriersSerializer
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view
-from app.filters import client_filters, carrier_filters
+from app.filters import client_filters, carrier_filters, request_filters, request_carrier_filters
 from project.settings.django_environ import env
 from app.helpers import get_currencies
 from django.db.utils import IntegrityError
+from back.models import Profile
 import json
 
 
@@ -88,7 +89,8 @@ class RequestViewSet(
 
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Request.objects.all().order_by('date_of_request')
+            profile = Profile.objects.get(user_id=self.request.user)
+            return request_filters(self.request, profile.is_logistics, self.request.user.pk)
         else:
             return Request.objects.all().order_by('date_of_request').filter(executor=self.request.user.pk)
 
@@ -114,10 +116,11 @@ class RequestViewSet(
     def create(self, request, *args, **kwargs):
         request.data['executor'] = request.user.pk
         serializer = self.serializer_class(data=request.data)
+        
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
-        return Response({'message': 'Что-то пошло не так!'}, status=status.HTTP_400_BAD_REQUEST)
+
     
     def destroy(self, request, pk, *args, **kwargs):
         instance = get_object_or_404(Request, pk=pk)
@@ -142,7 +145,7 @@ class RequestViewSet(
     
     @action(detail=False, methods=['GET'])
     def archived(self, request, *args, **kwargs):
-        instances = self.get_queryset().filter(status__in=['archived', 'complete'])
+        instances = self.get_queryset().filter(status='complete')
         serializer = OrdersSerializer(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -196,12 +199,43 @@ class CarrierViewSet(
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['GET'])
-    def overcomes(self, request, *args, **kwargs):
-        carriers_id = Request.objects.filter(status='on it').values_list('carrier', flat=True)
-        queryset = Carrier.objects.filter(pk__in=carriers_id)
-        serializer = self.serializer_class(queryset, many=True)
+
+class RequestCarrierViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    GenericViewSet
+    ):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RequestCarriersSerializer
+    
+    def get_queryset(self):
+        return request_carrier_filters(self.request)
+    
+    def list(self, request, *args, **kwargs):
+        instances = self.get_queryset().filter(request_id=request.query_params['request_id'])
+        serializer = self.serializer_class(instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'message': 'Перевозчик был добавлен в запрос'}, status=status.HTTP_201_CREATED)
+        
+    def update(self, request, pk, *args, **kwargs):
+        instance = get_object_or_404(RequestCarrier, pk=pk)
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'message': 'Данные были обновлены'}, status=status.HTTP_200_OK)
+        
+    def destroy(self, request, pk, *args, **kwargs):
+        instance = get_object_or_404(RequestCarrier, pk=pk)
+        instance.delete()
+        return Response({'message': 'Перевозчик был удален с запроса'}, status=status.HTTP_200_OK)
+    
     
     @action(detail=False, methods=['GET'])
     def consumption(self, request, *args, **kwargs):
@@ -209,7 +243,8 @@ class CarrierViewSet(
         queryset = self.get_queryset().filter(pk__in=carriers_id)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+  
 
 class DocsRequestsViewSet(
     mixins.ListModelMixin,

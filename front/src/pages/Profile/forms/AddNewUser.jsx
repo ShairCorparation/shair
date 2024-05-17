@@ -1,6 +1,6 @@
 import {
     Grid, Typography, Paper, TextField, Button, TableContainer, Table, TableCell, Tooltip, IconButton,
-    TableRow, TableBody, TableHead
+    TableRow, TableBody, TableHead, Checkbox
 } from '@mui/material';
 import FormError from '../../../components/FormError/FormError';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,10 +9,11 @@ import { api } from '../../../api/api';
 import { useEffect, useState } from 'react'
 
 
-export default function AddNewUser({ setAlertInfo }) {
+export default function AddNewUser({ setAlertInfo, currentUser }) {
     const { register, formState: { errors }, handleSubmit } = useForm()
     const [users, setUsers] = useState(null)
     const [loader, setLoader] = useState(false)
+    const [mode, setMode] = useState(false)
 
     const handleSave = (form_data) => {
         api(`/auth/register/`, 'POST', form_data).then(() => {
@@ -36,13 +37,35 @@ export default function AddNewUser({ setAlertInfo }) {
         })
     }, [loader])
 
+    const handleChange = (e) => {
+        setMode(e.target.checked)
+        api(`/auth/profile/${currentUser.id}/`, 'PATCH', {'is_logistics': e.target.checked}).then(() => {
+        })
+    }
+
+    useEffect(() => {
+        api(`/auth/profile/`, 'GET', {}, false, {params: {'user_id': currentUser.id}}).then(res => {
+            setMode(res.data.is_logistics)
+            console.log(res.data)
+        }
+        )
+    }, [])
+
     return (
         <Grid container item xs={12} md={6} p={2} justifyContent='center'>
-            
+
             <Grid item component={Paper} mt={2} mb={2} xs={12}>
                 <form onSubmit={handleSubmit(handleSave)}>
 
                     <Grid container p={3} spacing={1}>
+                        <Grid container item xs={12} align="left" alignItems={'center'}>
+                            <Grid item >
+                                <Checkbox checked={mode} onChange={handleChange}/>
+                            </Grid>
+                            <Grid item >
+                                <Typography>режим логиста</Typography>
+                            </Grid>
+                        </Grid>
                         <Grid item xs={12} align='center'>
                             <Typography variant='h6'>Создание нового сотрудника</Typography>
                         </Grid>

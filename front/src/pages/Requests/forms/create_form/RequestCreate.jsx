@@ -17,7 +17,7 @@ import './request_create.css'
 
 
 export default function RequestCreate() {
-    const { register, control, reset, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
+    const { register, trigger, control, reset, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
     const [countries, setCountries] = useState([])
@@ -26,6 +26,7 @@ export default function RequestCreate() {
     const [valueCity, setValueCity] = useState()
 
     const handleSave = (form_data) => {
+
         api(`/api/requests/`, 'POST', form_data)
             .then((res) => {
                 window.location.href = '/'
@@ -48,7 +49,6 @@ export default function RequestCreate() {
 
 
     useEffect(() => {
-        
         const timeoutId = setTimeout(() => {
             if (valueCountry && !countries.includes(valueCountry)) {
                 setCountries([...countries, valueCountry])
@@ -85,20 +85,23 @@ export default function RequestCreate() {
                                     </Grid>
                                     <Grid container item xs={12} md={6} p={1}>
                                         <Grid item xs={10}>
-                                            <FormControl sx={{ width: '100%' }} size='small'>
-                                                <InputLabel id="demo-simple-select-label">Клиент</InputLabel>
-                                                <Select
-                                                    labelId="demo-simple-select-label"
-                                                    id="demo-simple-select"
-                                                    label="Клиент"
-                                                    {...register('client', { required: true })}
-                                                >
-                                                    {clients && clients.map((client) => (
-                                                        <MenuItem value={client.id}>{client.company_name}</MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
+
+                                            <Autocomplete
+                                                disablePortal
+                                                id="combo-box-demo"
+                                                fullWidth
+                                                size='small'
+                                                getOptionLabel={(option) => option.company_name}
+                                                {...register('client', { required: true })}
+                                                onChange={(e, v) =>  {
+                                                    setValue('client', v.id)
+                                                    trigger('client')
+                                                }}
+                                                options={clients}
+                                                renderInput={(params) => <TextField  {...params} label="Клиент" />}
+                                            />
                                             <FormError error={errors?.client} />
+
                                         </Grid>
                                         <Grid item xs={2} align='end'>
                                             <IconButton aria-label="delete" size="25px" align='end'
@@ -298,6 +301,10 @@ export default function RequestCreate() {
                                         size='small'
                                         onInput={(e) => setValueCountry(e.target.value)}
                                         getOptionLabel={(option) => option}
+                                        onChange={(e, v) => {
+                                            setValue('country_of_dispatch', v)
+                                            trigger('country_of_dispatch')
+                                            }}
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
@@ -311,6 +318,10 @@ export default function RequestCreate() {
                                         fullWidth
                                         size='small'
                                         onInput={(e) => setValueCountry(e.target.value)}
+                                        onChange={(e, v) => {
+                                            setValue('delivery_country', v)
+                                            trigger('delivery_country')
+                                            }}
                                         getOptionLabel={(option) => option}
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
@@ -326,6 +337,10 @@ export default function RequestCreate() {
                                         size='small'
                                         getOptionLabel={(option) => option}
                                         onInput={(e) => setValueCity(e.target.value)}
+                                        onChange={(e, v) => {
+                                            setValue('city_of_dispatch', v)
+                                            trigger('city_of_dispatch')
+                                            }}
                                         options={cities}
                                         renderInput={(params) => <TextField {...register('city_of_dispatch', { required: true })} {...params} label="Город отгрузки" />}
                                     />
@@ -338,10 +353,15 @@ export default function RequestCreate() {
                                         id="combo-box-demo"
                                         fullWidth
                                         size='small'
+                                        {...register('delivery_city', { required: true })}
                                         getOptionLabel={(option) => option}
                                         onInput={(e) => setValueCity(e.target.value)}
+                                        onChange={(e, v) => {
+                                            setValue('delivery_city', v)
+                                            trigger('delivery_city')
+                                            }}
                                         options={cities}
-                                        renderInput={(params) => <TextField {...register('delivery_city', { required: true })} {...params} label="Город доставки" />}
+                                        renderInput={(params) => <TextField  {...params} label="Город доставки" />}
                                     />
                                     <FormError error={errors?.delivery_city} />
                                 </Grid>

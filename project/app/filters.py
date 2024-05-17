@@ -1,4 +1,4 @@
-from app.models import Request, Carrier
+from app.models import Request, Carrier, RequestCarrier
 import datetime as dt
 
 
@@ -150,5 +150,46 @@ def carrier_filters(request):
         carriers_id = Request.objects.filter(pk=request_id).values_list('carrier', flat=True)
         queryset = queryset.filter(pk__in=carriers_id)
 
-
     return queryset.order_by('company_name') 
+
+
+def request_filters(request, is_logistics, user_pk):
+    
+    queryset = Request.objects.all().order_by('date_of_request')
+    executor = request.query_params.get('executor')
+    
+    if executor and int(executor) > 0:
+        queryset = queryset.filter(executor=executor)
+    elif is_logistics:
+        queryset = queryset.filter(executor=user_pk)
+        
+    return queryset
+
+
+def request_carrier_filters(request):
+    queryset = RequestCarrier.objects.all().order_by('carrier_id')
+    
+    name_of_cargo = request.query_params.get('name_of_cargo')
+    request_id = request.query_params.get('request_id')
+    date_of_shipment = request.query_params.get('date_of_shipment')
+    date_of_delivery = request.query_params.get('date_of_delivery')
+    
+    if date_of_shipment:
+        carriers_id = Request.objects.filter(date_of_shipment__gte=dt.datetime.strptime(date_of_shipment, '%Y-%m-%d')).values_list('carrier', flat=True)
+        queryset = queryset.filter(pk__in=carriers_id)
+
+    if date_of_delivery:
+        carriers_id = Request.objects.filter(date_of_delivery__lte=dt.datetime.strptime(date_of_delivery, '%Y-%m-%d')).values_list('carrier', flat=True)
+        queryset = queryset.filter(pk__in=carriers_id)
+
+    # report filters
+
+    if name_of_cargo:
+        carriers_id = Request.objects.filter(name_of_cargo=name_of_cargo).values_list('carrier', flat=True)
+        queryset = queryset.filter(pk__in=carriers_id)
+
+    if request_id:
+        carriers_id = Request.objects.filter(pk=request_id).values_list('carrier', flat=True)
+        queryset = queryset.filter(pk__in=carriers_id)
+        
+    return queryset

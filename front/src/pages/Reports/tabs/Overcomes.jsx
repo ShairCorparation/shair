@@ -45,6 +45,7 @@ export default function Overcomes() {
                     duration_city_up: filterData.duration_city_up,
                     date_of_shipment: filterData.date_of_shipment,
                     date_of_delivery: filterData.date_of_delivery,
+                    executor: filterData.executor
                 }
             }
         ).then((res) => {

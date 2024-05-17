@@ -14,6 +14,7 @@ import TakeToJob from './forms/take_to_job/TakeToJob';
 import ChangeDesc from './forms/change_desc/ChangeDesc';
 import DeleteRequest from './forms/delete_request/DeleteRequest';
 import RequestEdit from './forms/edit_form/RequestEdit';
+import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
 import { api } from '../../api/api';
 import './requests.css'
 
@@ -28,26 +29,47 @@ export default function Requests({ setAlertInfo }) {
     const [currentReq, setCurrentReq] = React.useState(null)
     const [loader, setLoader] = React.useState(true)
     const [requests, setRequests] = React.useState(null)
+    const [executor, setExecutor] = React.useState(0)
+
+    const [userInfo, setUserInfo] = React.useState(null)
+
 
     React.useEffect(() => {
-        async function fetch_requests() {
-            await api(`/api/requests/`).then((res) => {
-                setRequests(res.data)
-            }).catch(() => { })
-        }
+        api(`/api/requests/`).then((res) => {
+            setRequests(res.data)
+        }).catch(() => { })
 
-        fetch_requests()
+        api('/auth/users_info/current_user/').then((res) => {
+                setUserInfo(res.data)
+            })
+
         setLoader(false)
     }, [loader])
+
+    React.useEffect(() => {
+        api('/api/requests/', 'GET', {}, false, {
+                params: {
+                    'executor': executor
+                }
+            }).then(res => setRequests(res.data))
+        
+    }, [executor])
+
+
 
     return (
         requests &&
         <React.Fragment>
             <Grid container className='navigate_panel_requests' mb={1}>
-                <Grid item xs={8} md={4}>
+                <Grid item xs={12} md={4}>
                     <Link href='/create_request'>
                         <Button variant="outlined" color='success' startIcon={<AddCircleIcon />}>Создать запрос</Button>
                     </Link>
+                </Grid>
+                <Grid container xs={12} md={8}>
+                    {userInfo?.is_staff && 
+                        <ExecutorFilter setExecutor={setExecutor} executor={executor}/>
+                    }
                 </Grid>
             </Grid>
             <TableContainer component={Paper}>
@@ -89,7 +111,7 @@ export default function Requests({ setAlertInfo }) {
                                 <TableCell align="left">
                                     {req.carrier_list.map((carr)=> (
                                         <React.Fragment>
-                                            {carr.company_name } - {carr.rate} {carr.currency}
+                                            {carr.company_name } - {carr.carrier_rate} {carr.carrier_currency}
                                             <br />
                                         </React.Fragment>
                                     ))} 

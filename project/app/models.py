@@ -1,7 +1,9 @@
 from django.db import models
 from app.constants import CurrencyChoices, StatusRequestChoices
 from django.db.models import UniqueConstraint
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Request(models.Model):
     date_of_shipment = models.DateField(verbose_name='Дата загрузки')
@@ -27,10 +29,10 @@ class Request(models.Model):
     status = models.CharField(choices=StatusRequestChoices, default=StatusRequestChoices.created, verbose_name='Статус запроса')
     executor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Исполнитель')
     client = models.ForeignKey('Client', on_delete=models.SET_NULL, null=True, verbose_name='Заказчик')
-    carrier = models.ForeignKey('Carrier', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Перевозчик')
+    carrier = models.ForeignKey('RequestCarrier', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Перевозчик')
     payment_from_carrier = models.BooleanField(default=False, verbose_name='Оплата от перевозчика')
     payment_from_client = models.BooleanField(default=False, verbose_name='Оплата от заказчика')
-
+    
     class Meta:
         verbose_name = 'Запросы и Заказы'
         verbose_name_plural = 'Запросы и Заказы'
@@ -59,6 +61,19 @@ class Client(models.Model):
         return f'{self.contact_person} | {self.company_name}'
     
 
+class RequestCarrier(models.Model):
+    carrier_id = models.ForeignKey('Carrier', on_delete=models.CASCADE)
+    request_id = models.ForeignKey(Request, on_delete=models.CASCADE)
+    carrier_rate = models.PositiveBigIntegerField(default=0, verbose_name='Ставка перевозчика')
+    carrier_currency = models.CharField(default=CurrencyChoices.byn, choices=CurrencyChoices, verbose_name='Валюта перевозчика')
+    
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['carrier_id', 'request_id'], name='unique_request_carrier', 
+                             violation_error_message='Перевозчик уже добавлен в данный запрос')
+        ]
+    
+
 class Carrier(models.Model):
     created_date = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     company_name = models.CharField(max_length=256, verbose_name='Название компании')
@@ -69,8 +84,6 @@ class Carrier(models.Model):
     rate = models.PositiveBigIntegerField(blank=True, verbose_name='Ставка')
     currency = models.CharField(choices=CurrencyChoices, verbose_name='Валюта')
     note = models.CharField(blank=True, verbose_name='Примечание')
-
-    request_id = models.ForeignKey(Request, on_delete=models.CASCADE, null=True, related_name='carriers', verbose_name='Запрос')
     
     class Meta:
         verbose_name = 'Перевозчики'
@@ -103,5 +116,8 @@ class Currency(models.Model):
         verbose_name_plural = 'Валюты'
 
     def __str__(self):
-        return f'{self.USD} {self.EUR} {self.RUB} '
+        return f'{self.USD} {self.EUR} {self.RUB}'
+    
+    
+    
     

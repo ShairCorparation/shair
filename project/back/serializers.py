@@ -1,9 +1,17 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from app.models import Request
+from django.contrib.auth import get_user_model
+from back.models import Profile
+
+User = get_user_model()
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Profile
+        fields = '__all__'
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -48,24 +56,34 @@ class OvercomesUserSerializer(serializers.ModelSerializer):
     consumption = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(executor=instance.pk, status='complete').count()
+        return Request.objects.filter(executor=instance.pk, status='on it').count()
 
     def get_fraht(self, instance):
-        requests = Request.objects.filter(status='complete', executor=instance.id).only('currency', 'customer_price')
+        requests = Request.objects.filter(status='on it', executor=instance.id).only('currency', 'customer_price')
         total_sum = 0
 
         for request in requests:
-            converted_price = request.customer_price * self.context[request.currency]
+            if request.currency == 'RUB':
+                converted_price = request.customer_price * self.context[request.currency] / 100
+            elif request.currency == 'BYN':
+                converted_price = request.customer_price
+            else:
+                converted_price = request.customer_price * self.context[request.currency]
             total_sum += converted_price
  
         return(round(total_sum, 2))
     
     def get_consumption(self, instance):
-        requests = Request.objects.filter(status='complete', executor=instance.id).only('currency', 'customer_price')
+        requests = Request.objects.filter(status='on it', executor=instance.id).only('currency', 'customer_price')
         total_sum = 0
 
         for request in requests:
-            converted_price = request.carrier.rate * self.context[request.carrier.currency]
+            if request.carrier.carrier_currency == 'RUB':
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency] / 100
+            elif request.carrier.carrier_currency == 'BYN':
+                converted_price = request.carrier.carrier_rate
+            else:
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency]
             total_sum += converted_price
 
         return(round(total_sum, 2))
@@ -85,10 +103,12 @@ class ExecutorFinesSerializer(serializers.ModelSerializer):
         total_sum = 0
 
         for request in requests:
-            if request.currency == 'RUB':
-                converted_price = request.carrier.rate * self.context[request.carrier.currency] / 100
+            if request.carrier.carrier_currency == 'RUB':
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency] / 100
+            elif request.carrier.carrier_currency == 'BYN':
+                converted_price =  request.carrier.carrier_rate
             else:
-                converted_price = request.carrier.rate * self.context[request.carrier.currency]
+                converted_price = request.carrier.carrier_rate * self.context[request.carrier.carrier_currency]
             total_sum += converted_price 
             
         return(round(total_sum, 2))
@@ -101,6 +121,8 @@ class ExecutorFinesSerializer(serializers.ModelSerializer):
         for request in requests: 
             if request.currency == 'RUB':
                 converted_price = request.customer_price * self.context[request.currency] / 100
+            elif request.currency == 'BYN':
+                converted_price = request.customer_price
             else:
                 converted_price = request.customer_price * self.context[request.currency]   
             total_sum += converted_price

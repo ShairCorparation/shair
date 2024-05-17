@@ -8,7 +8,7 @@ class DocsRequestInline(admin.TabularInline):
     fields = ['name', 'file']
 
 @admin.register(Currency)
-class CurrencyAdminv(admin.ModelAdmin):
+class CurrencyAdmin(admin.ModelAdmin):
     list_display = ['USD', 'EUR', 'RUB']
     list_filter = ['USD', 'EUR', 'RUB']
 
