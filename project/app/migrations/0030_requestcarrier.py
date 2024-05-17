@@ -6,20 +6,12 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     
-    def fill_model(apps, schema_editor):
-        RequestCarrier = apps.get_model('app', 'RequestCarrier')
-        Request = apps.get_model('app', 'Request')
-        
-        for el in Request.objects.all():
-            RequestCarrier.objects.create(
-                carrier_id=el.carrier, request_id=el, carrier_rate=el.carrier.rate, carrier_currency=el.carrier.currency)
 
     dependencies = [
         ('app', '0029_remove_carrier_request_id'),
     ]
     
-    def reverse(apps, schema_editor):
-        pass
+    
 
     operations = [
         migrations.CreateModel(
@@ -30,5 +22,5 @@ class Migration(migrations.Migration):
                 ('request_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.request')),
             ],
         ),
-        migrations.RunPython(fill_model, reverse)
+        
     ]
