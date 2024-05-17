@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
         
         for el in Request.objects.all():
             RequestCarrier.objects.create(
-                carrier_id=el.carrier, request_id=el.pk, carrier_rate=el.carrier.rate, carrier_currency=el.carrier.currency)
+                carrier_id=el.carrier, request_id=el, carrier_rate=el.carrier.rate, carrier_currency=el.carrier.currency)
 
     dependencies = [
         ('app', '0029_remove_carrier_request_id'),
