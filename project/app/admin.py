@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app.models import Client, Request, Carrier, Docs, Currency
+from app.models import Client, Request, Carrier, Docs, Currency, RequestCarrier
 
 
 class DocsRequestInline(admin.TabularInline):
@@ -11,6 +11,11 @@ class DocsRequestInline(admin.TabularInline):
 class CurrencyAdmin(admin.ModelAdmin):
     list_display = ['USD', 'EUR', 'RUB']
     list_filter = ['USD', 'EUR', 'RUB']
+    
+@admin.register(RequestCarrier)
+class RequestCarrierAdmin(admin.ModelAdmin):
+    list_display = ['pk','carrier_rate', 'carrier_currency']
+    list_filter = ['pk','carrier_rate', 'carrier_currency']
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
