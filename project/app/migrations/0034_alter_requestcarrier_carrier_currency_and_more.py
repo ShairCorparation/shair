@@ -6,12 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     
     def fill_model(apps, schema_editor):
+        Carrier = apps.get_model('app', 'Carrier')
         RequestCarrier = apps.get_model('app', 'RequestCarrier')
-        Request = apps.get_model('app', 'Request')
         
-        for el in Request.objects.all():
-            RequestCarrier.objects.create(
-                carrier_id=el.carrier, request_id=el, carrier_rate=el.carrier.rate, carrier_currency=el.carrier.currency)
+        for el in RequestCarrier.objects.all():
+            get_obj = Carrier.objects.get(pk=el.carrier_id)
+            el.carrier_rate = get_obj.rate
+            el.carrier_currency = get_obj.currency
+            el.save()
             
     def reverse(apps, schema_editor):
         pass
