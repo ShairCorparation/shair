@@ -17,6 +17,9 @@ class Migration(migrations.Migration):
     dependencies = [
         ('app', '0029_remove_carrier_request_id'),
     ]
+    
+    def reverse(apps, schema_editor):
+        pass
 
     operations = [
         migrations.CreateModel(
@@ -27,5 +30,5 @@ class Migration(migrations.Migration):
                 ('request_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.request')),
             ],
         ),
-        migrations.RunPython(fill_model)
+        migrations.RunPython(fill_model, reverse)
     ]
