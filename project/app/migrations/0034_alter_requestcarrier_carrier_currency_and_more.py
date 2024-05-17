@@ -4,19 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    
-    def fill_model(apps, schema_editor):
-        Carrier = apps.get_model('app', 'Carrier')
-        RequestCarrier = apps.get_model('app', 'RequestCarrier')
-        
-        for el in RequestCarrier.objects.all():
-            get_obj = Carrier.objects.get(pk=el.carrier_id)
-            el.carrier_rate = get_obj.rate
-            el.carrier_currency = get_obj.currency
-            el.save()
-            
-    def reverse(apps, schema_editor):
-        pass
 
     dependencies = [
         ('app', '0033_alter_request_carrier'),
@@ -33,6 +20,5 @@ class Migration(migrations.Migration):
             name='carrier_rate',
             field=models.PositiveBigIntegerField(default=0, verbose_name='Ставка перевозчика'),
         ),
-        migrations.RunPython(fill_model, reverse)
         
     ]
