@@ -14,8 +14,8 @@ class CurrencyAdmin(admin.ModelAdmin):
     
 @admin.register(RequestCarrier)
 class RequestCarrierAdmin(admin.ModelAdmin):
-    list_display = ['pk','carrier_rate', 'carrier_currency']
-    list_filter = ['pk','carrier_rate', 'carrier_currency']
+    list_display = ['id','carrier_rate', 'carrier_currency']
+    list_filter = ['id','carrier_rate', 'carrier_currency']
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
