@@ -67,6 +67,8 @@ class RequestCarrier(models.Model):
     carrier_rate = models.PositiveBigIntegerField(default=0, verbose_name='Ставка перевозчика')
     carrier_currency = models.CharField(default=CurrencyChoices.byn, choices=CurrencyChoices, verbose_name='Валюта перевозчика')
     
+    def __str__(self):
+        return f'{self.carrier_id.company_name} {self.carrier_id.contact_person}'
     class Meta:
         constraints = [
             UniqueConstraint(fields=['carrier_id', 'request_id'], name='unique_request_carrier', 
