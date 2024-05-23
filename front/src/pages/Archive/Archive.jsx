@@ -110,7 +110,7 @@ export default function Archive() {
                                 <TableCell align="left">
                                     {req.client.contact_person}
                                     <br />
-                                    {req.client.unp}
+                                    {req.client.contact_info}
                                 </TableCell>
                                 <TableCell align="left">
                                     {req.volume !== '' && `Объем: ${req.volume}; `}
@@ -132,7 +132,7 @@ export default function Archive() {
                                 <TableCell align="left">
                                     {req.carrier.contact_person}
                                     <br />
-                                    {req.carrier.unp}
+                                    {req.carrier.contact_info}
                                 </TableCell>
                                 <TableCell align='center'>
                                     <Button variant='contained' color='primary'

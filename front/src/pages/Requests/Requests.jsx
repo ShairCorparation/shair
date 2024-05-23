@@ -105,13 +105,13 @@ export default function Requests({ setAlertInfo }) {
                                 <TableCell align="left">
                                     {req.client.company_name}
                                     <br />
-                                    {req.client.unp}
+                                    {req.client.contact_info}
                                 </TableCell>
                                 <TableCell align="left">{req.customer_price} BYN</TableCell>
                                 <TableCell align="left">
                                     {req.carrier_list.map((carr)=> (
                                         <React.Fragment>
-                                            {carr.company_name } - {carr.carrier_rate} {carr.carrier_currency}
+                                            {carr.contact_info } - {carr.carrier_rate} {carr.carrier_currency}
                                             <br />
                                         </React.Fragment>
                                     ))} 

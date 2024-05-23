@@ -45,8 +45,8 @@ class DocsRequestSerializer(serializers.ModelSerializer):
 class RequestCarriersSerializer(serializers.ModelSerializer):
     company_name = serializers.SerializerMethodField()
     contact_person = serializers.SerializerMethodField()
+    contact_info = serializers.SerializerMethodField()
     unp = serializers.SerializerMethodField()
-    
     
     def get_company_name(self, instance):
         return Carrier.objects.get(pk=instance.carrier_id.pk).company_name
@@ -57,6 +57,8 @@ class RequestCarriersSerializer(serializers.ModelSerializer):
     def get_unp(self, instance):
         return Carrier.objects.get(pk=instance.carrier_id.pk).unp
         
+    def get_contact_info(self, instance):
+        return Carrier.objects.get(pk=instance.carrier_id.pk).contact_info
     
     class Meta:
         model = RequestCarrier
