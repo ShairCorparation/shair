@@ -131,7 +131,7 @@ export default function Orders() {
                                 <TableCell align="left">
                                     {req.client.company_name}
                                     <br />
-                                    {req.client.contact_info}
+                                    {req.client.unp}
                                 </TableCell>
                                 <TableCell align="left">
                                     {req.volume !== '' && `Объем: ${req.volume}; `}

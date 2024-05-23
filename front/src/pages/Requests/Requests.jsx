@@ -105,7 +105,7 @@ export default function Requests({ setAlertInfo }) {
                                 <TableCell align="left">
                                     {req.client.company_name}
                                     <br />
-                                    {req.client.contact_info}
+                                    {req.client.unp}
                                 </TableCell>
                                 <TableCell align="left">{req.customer_price} BYN</TableCell>
                                 <TableCell align="left">
