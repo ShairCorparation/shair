@@ -17,13 +17,12 @@ import axios from 'axios';
 
 export default function Archive() {
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
-    const [loader, setLoader] = React.useState(false)
     const [requests, setRequests] = React.useState(null)
     const [doc_dialog, setDocDialog] = React.useState(false)
     const [changeDesc, setChangeDesc] = React.useState(false)
     const [curr_req, setCureReq] = React.useState(null)
 
-    const [executor, setExecutor] = React.useState(0)
+    const [executor, setExecutor] = React.useState(null)
     const [userInfo, setUserInfo] = React.useState(null)
 
     const [EUR, setEUR] = React.useState(0)
@@ -47,22 +46,21 @@ export default function Archive() {
             setUserInfo(res.data)
         })
 
-    }, [])
-
-    useEffect(() => {
         api(`/api/requests/archived/`, 'GET').then((res) => {
             setRequests(res.data)
-            setLoader(false)
         })
 
-    }, [loader])
+    }, [])
+
 
     useEffect(() => {
-        api('/api/requests/archived/', 'GET', {}, false, {
-            params: {
-                'executor': executor
-            }
-        }).then(res => setRequests(res.data))
+        if (executor !== null) {
+            api('/api/requests/archived/', 'GET', {}, false, {
+                params: {
+                    'executor': executor
+                }
+            }).then(res => setRequests(res.data))
+        }
     }, [executor])
 
 
@@ -183,7 +181,7 @@ export default function Archive() {
             {curr_req &&
                 <React.Fragment>
                     <DocForm doc_dialog={doc_dialog} setDocDialog={setDocDialog} curr_req={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
-                    <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
+                    <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
                 </React.Fragment>
             }
 

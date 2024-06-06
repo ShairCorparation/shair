@@ -32,7 +32,7 @@ export default function Orders() {
     const [editDialog, setEditDialog] = React.useState(false)
     const [curr_req, setCureReq] = React.useState(null)
     const [userInfo, setUserInfo] = React.useState(null)
-    const [executor, setExecutor] = React.useState(0)
+    const [executor, setExecutor] = React.useState(null)
 
     const [EUR, setEUR] = React.useState(0)
     const [USD, setUSD] = React.useState(0)
@@ -55,23 +55,32 @@ export default function Orders() {
 
 
     useEffect(() => {
-        api(`/api/requests/on_it/`, 'GET').then((res) => {
-            setRequests(res.data)
-            setLoader(false)
-        })
+        async function fetch_requests() {
+            await api(`/api/requests/on_it/`, 'GET').then((res) => {
+                setRequests(res.data)
+                setLoader(false)
+            })
+        }
 
-        api('/auth/users_info/current_user/').then((res) => {
-            setUserInfo(res.data)
-        })
+        async function get_user_info() {
+            api('/auth/users_info/current_user/').then((res) => {
+                setUserInfo(res.data)
+            })
+        }
+
+        fetch_requests()
+        get_user_info()
 
     }, [loader])
 
     React.useEffect(() => {
-        api('/api/requests/on_it/', 'GET', {}, false, {
-            params: {
-                'executor': executor
-            }
-        }).then(res => setRequests(res.data))
+        if (executor !== null) {
+            api('/api/requests/on_it/', 'GET', {}, false, {
+                params: {
+                    'executor': executor
+                }
+            }).then(res => setRequests(res.data))
+        }
     }, [executor])
 
     function clientPayment(value, req_id) {

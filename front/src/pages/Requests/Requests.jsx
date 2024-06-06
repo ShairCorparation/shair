@@ -17,6 +17,7 @@ import RequestEdit from './forms/edit_form/RequestEdit';
 import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
 import { api } from '../../api/api';
 import './requests.css'
+import createMixins from '@mui/material/styles/createMixins';
 
 
 export default function Requests({ setAlertInfo }) {
@@ -29,33 +30,37 @@ export default function Requests({ setAlertInfo }) {
     const [currentReq, setCurrentReq] = React.useState(null)
     const [loader, setLoader] = React.useState(true)
     const [requests, setRequests] = React.useState(null)
-    const [executor, setExecutor] = React.useState(0)
+    const [executor, setExecutor] = React.useState(null)
 
     const [userInfo, setUserInfo] = React.useState(null)
 
 
     React.useEffect(() => {
-        api(`/api/requests/`).then((res) => {
-            setRequests(res.data)
-        }).catch(() => { })
+        async function fetch_requests() {
+            await api(`/api/requests/`).then((res) => {
+                setRequests(res.data)
+            }).catch(() => { })
+        }
 
-        api('/auth/users_info/current_user/').then((res) => {
+        async function get_user_info() {
+            await api('/auth/users_info/current_user/').then((res) => {
                 setUserInfo(res.data)
-            })
-
+            }).catch(() => { })
+        }
+        fetch_requests()
+        get_user_info()
         setLoader(false)
-    }, [loader])
+    }, [])
 
     React.useEffect(() => {
+        if (executor !== null) {
         api('/api/requests/', 'GET', {}, false, {
-                params: {
-                    'executor': executor
-                }
-            }).then(res => setRequests(res.data))
-        
+            params: {
+                'executor': executor
+            }
+        }).then(res => setRequests(res.data))
+    }
     }, [executor])
-
-
 
     return (
         requests &&
@@ -67,8 +72,8 @@ export default function Requests({ setAlertInfo }) {
                     </Link>
                 </Grid>
                 <Grid container xs={12} md={8}>
-                    {userInfo?.is_staff && 
-                        <ExecutorFilter setExecutor={setExecutor} executor={executor}/>
+                    {userInfo?.is_staff &&
+                        <ExecutorFilter setExecutor={setExecutor} executor={executor} />
                     }
                 </Grid>
             </Grid>
@@ -109,13 +114,13 @@ export default function Requests({ setAlertInfo }) {
                                 </TableCell>
                                 <TableCell align="left">{req.customer_price} BYN</TableCell>
                                 <TableCell align="left">
-                                    {req.carrier_list.map((carr)=> (
+                                    {req.carrier_list.map((carr) => (
                                         <React.Fragment>
-                                            {carr.contact_info } - {carr.carrier_rate} {carr.carrier_currency}
+                                            {carr.contact_info} - {carr.carrier_rate} {carr.carrier_currency}
                                             <br />
                                         </React.Fragment>
-                                    ))} 
-                                    
+                                    ))}
+
                                 </TableCell>
                                 <TableCell align="left">
 
@@ -135,7 +140,7 @@ export default function Requests({ setAlertInfo }) {
                                             onClick={() => {
                                                 setCarrierDialog(true)
                                                 setCurrentReq(req)
-                                                }}
+                                            }}
                                         >
                                             <FireTruckIcon color='secondary' />
                                         </IconButton>
@@ -182,16 +187,16 @@ export default function Requests({ setAlertInfo }) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            
+
 
             {currentReq &&
 
                 <React.Fragment>
-                    <TakeToJob setOpen={setTakeToJobDialog} open={takeToJobDialog} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq}/>
-                    <ChangeDesc setOpen={setChangeDesc} open={changeDesc} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq}/>
-                    <DeleteRequest setOpen={setDeleteRequest} open={deleteRequest} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq}/>
-                    <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={currentReq} setLoader={setLoader} setCurrentReq={setCurrentReq}/>
-                    <CreateCarrier open={carrierDialog} setOpen={setCarrierDialog} request={currentReq} setCurrentReq={setCurrentReq} setLoader={setLoader}/>
+                    <TakeToJob setOpen={setTakeToJobDialog} open={takeToJobDialog} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
+                    <ChangeDesc setOpen={setChangeDesc} open={changeDesc} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
+                    <DeleteRequest setOpen={setDeleteRequest} open={deleteRequest} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
+                    <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={currentReq} setLoader={setLoader} setCurrentReq={setCurrentReq} />
+                    <CreateCarrier open={carrierDialog} setOpen={setCarrierDialog} request={currentReq} setCurrentReq={setCurrentReq} setLoader={setLoader} />
                 </React.Fragment>
             }
 

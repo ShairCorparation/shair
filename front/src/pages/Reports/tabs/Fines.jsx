@@ -26,6 +26,7 @@ export default function Fines() {
     }, [])
 
     useEffect(() => {
+        
         if (selector === 'client') {
             api(`/api/clients/fines/`, 'GET', {}, false,
                 {
@@ -49,7 +50,6 @@ export default function Fines() {
                 }
             ).then((res) => {
                 setClients(res.data)
-                console.log(res.data)
             })
         }
 

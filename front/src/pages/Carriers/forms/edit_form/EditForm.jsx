@@ -23,15 +23,6 @@ export default function EditForm({ open, setOpen, carrier, setAlertInfo, setLoad
         setCurrCarrier(null)
     };
 
-    // React.useEffect(() => {
-    //     if (carrier) {
-    //         api(`/api/carriers/${carrier}`).then((res) => {
-    //             setCarrierInfo(res.data)
-    //             console.log(res.data)
-    //         })
-    //     }
-    // }, [])
-
 
     return (
         <React.Fragment>

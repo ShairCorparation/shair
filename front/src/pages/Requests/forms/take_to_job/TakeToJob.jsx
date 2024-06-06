@@ -37,7 +37,6 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                 handleClose()
             })
             .catch((err) => {
-                console.log(err)
                 setAlertInfo({ open: open, color: 'error', message: err.response.data.unp[0] })
             })
     }

@@ -12,12 +12,10 @@ import { useEffect, useState } from 'react'
 export default function AddNewUser({ setAlertInfo, currentUser }) {
     const { register, formState: { errors }, handleSubmit } = useForm()
     const [users, setUsers] = useState(null)
-    const [loader, setLoader] = useState(false)
     const [mode, setMode] = useState(false)
 
     const handleSave = (form_data) => {
         api(`/auth/register/`, 'POST', form_data).then(() => {
-            setLoader(!loader)
             setAlertInfo({ open: true, color: 'success', message: 'Сотрудник был успешно создан!' })
         }).catch((err) => {
 
@@ -26,30 +24,25 @@ export default function AddNewUser({ setAlertInfo, currentUser }) {
 
     const handleDelete = (user_id) => {
         api(`/auth/users_info/${user_id}/`, 'DELETE').then(() => {
-            setLoader(!loader)
             setAlertInfo({ open: true, color: 'secondary', message: 'Сотрудник был успешно удален!' })
         })
     }
 
-    useEffect((res) => {
+    useEffect(() => {
+        api(`/auth/profile/`, 'GET', {}, false, { params: { 'user_id': currentUser.id } }).then(res => {
+            setMode(res.data.is_logistics)
+        })
+
         api(`/auth/users_info/`).then((res) => {
             setUsers(res.data)
         })
-    }, [loader])
+    }, [])
 
     const handleChange = (e) => {
         setMode(e.target.checked)
-        api(`/auth/profile/${currentUser.id}/`, 'PATCH', {'is_logistics': e.target.checked}).then(() => {
+        api(`/auth/profile/${currentUser.id}/`, 'PATCH', { 'is_logistics': e.target.checked }).then(() => {
         })
     }
-
-    useEffect(() => {
-        api(`/auth/profile/`, 'GET', {}, false, {params: {'user_id': currentUser.id}}).then(res => {
-            setMode(res.data.is_logistics)
-            console.log(res.data)
-        }
-        )
-    }, [])
 
     return (
         <Grid container item xs={12} md={6} p={2} justifyContent='center'>
@@ -60,7 +53,7 @@ export default function AddNewUser({ setAlertInfo, currentUser }) {
                     <Grid container p={3} spacing={1}>
                         <Grid container item xs={12} align="left" alignItems={'center'}>
                             <Grid item >
-                                <Checkbox checked={mode} onChange={handleChange}/>
+                                <Checkbox checked={mode} onChange={handleChange} />
                             </Grid>
                             <Grid item >
                                 <Typography>режим логиста</Typography>

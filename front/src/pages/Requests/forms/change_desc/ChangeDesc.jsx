@@ -7,7 +7,7 @@ import { api } from '../../../../api/api';
 import '../take_to_job/take_to_job.css'
 
 
-export default function ChangeDesc({ setOpen, open, currentReq, setLoader, setAlertInfo, setCurrentReq, purpose = '' }) {
+export default function ChangeDesc({ setOpen, open, currentReq, setAlertInfo, setCurrentReq, purpose = '' }) {
     const { register, handleSubmit, formState: { errors } } = useForm({ mode: 'onSubmit' })
 
     const handleClose = () => {
@@ -20,7 +20,6 @@ export default function ChangeDesc({ setOpen, open, currentReq, setLoader, setAl
         api(`/api/requests/${currentReq.id}/`, 'PATCH', data)
             .then((res) => {
                 setAlertInfo({ open: open, color: 'success', message: res.data.message })
-                setLoader(true)
                 setOpen(false)
             })
             .catch((err) => {
