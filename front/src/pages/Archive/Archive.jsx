@@ -86,8 +86,8 @@ export default function Archive() {
                 <Table size="small" aria-label="a dense table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Номер заказа</TableCell>
-                            <TableCell align="left">Дата заказа</TableCell>
+                            <TableCell>Дата загрузки</TableCell>
+                            <TableCell align="left">Дата доставки</TableCell>
                             <TableCell align="left">Клиент</TableCell>
                             <TableCell align="left">Инфо о грузе</TableCell>
                             <TableCell align="left">Маршруты</TableCell>
@@ -103,10 +103,10 @@ export default function Archive() {
                                 key={req.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">#{req.id}</TableCell>
-                                <TableCell align="left">{req.date_of_request}</TableCell>
+                                <TableCell component="th" scope="row">{req.date_of_shipment}</TableCell>
+                                <TableCell align="left">{req.date_of_delivery}</TableCell>
                                 <TableCell align="left">
-                                    {req.client.contact_person}
+                                    {req.client.company_name}
                                     <br />
                                     {req.client.contact_info}
                                 </TableCell>

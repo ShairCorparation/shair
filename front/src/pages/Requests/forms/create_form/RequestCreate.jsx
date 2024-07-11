@@ -13,6 +13,7 @@ import CreateClient from '../create_client/CreateClient';
 import { useState, useEffect } from 'react'
 import { api } from '../../../../api/api';
 import FormError from '../../../../components/FormError/FormError';
+import { useNavigate } from 'react-router-dom'
 import './request_create.css'
 
 
@@ -24,6 +25,8 @@ export default function RequestCreate() {
     const [cities, setCities] = useState([])
     const [valueCountry, setValueCountry] = useState()
     const [valueCity, setValueCity] = useState()
+    const navigate = useNavigate()
+
 
     const handleSave = (form_data) => {
 
@@ -36,16 +39,22 @@ export default function RequestCreate() {
     }
 
     useEffect(() => {
-        api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data)
-        })
+        if (!clients) {
+            api('/api/clients/', 'GET').then((res) => {
+                setClients(res.data)
+            })
+        }
 
-        api('/api/countries/').then((res) => {
-            setCountries([...JSON.parse(res.data)['countries']])
-            setCities([...JSON.parse(res.data)['cities']])
-        })
+    }, [clients])
 
-    }, [])
+    useEffect(() => {
+        if (countries.length === 0) {
+            api('/api/countries/').then((res) => {
+                setCountries([...JSON.parse(res.data)['countries']])
+                setCities([...JSON.parse(res.data)['cities']])
+            })
+        }
+    }, [countries])
 
 
     useEffect(() => {
@@ -93,7 +102,7 @@ export default function RequestCreate() {
                                                 size='small'
                                                 getOptionLabel={(option) => option.company_name}
                                                 {...register('client', { required: true })}
-                                                onChange={(e, v) =>  {
+                                                onChange={(e, v) => {
                                                     setValue('client', v.id)
                                                     trigger('client')
                                                 }}
@@ -304,7 +313,7 @@ export default function RequestCreate() {
                                         onChange={(e, v) => {
                                             setValue('country_of_dispatch', v)
                                             trigger('country_of_dispatch')
-                                            }}
+                                        }}
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('country_of_dispatch', { required: true })} {...params} label="Страна отгрузки" />}
                                     />
@@ -321,7 +330,7 @@ export default function RequestCreate() {
                                         onChange={(e, v) => {
                                             setValue('delivery_country', v)
                                             trigger('delivery_country')
-                                            }}
+                                        }}
                                         getOptionLabel={(option) => option}
                                         options={countries}
                                         renderInput={(params) => <TextField {...register('delivery_country', { required: true })} {...params} label="Страна доставки" />}
@@ -340,7 +349,7 @@ export default function RequestCreate() {
                                         onChange={(e, v) => {
                                             setValue('city_of_dispatch', v)
                                             trigger('city_of_dispatch')
-                                            }}
+                                        }}
                                         options={cities}
                                         renderInput={(params) => <TextField {...register('city_of_dispatch', { required: true })} {...params} label="Город отгрузки" />}
                                     />
@@ -359,7 +368,7 @@ export default function RequestCreate() {
                                         onChange={(e, v) => {
                                             setValue('delivery_city', v)
                                             trigger('delivery_city')
-                                            }}
+                                        }}
                                         options={cities}
                                         renderInput={(params) => <TextField  {...params} label="Город доставки" />}
                                     />
@@ -390,11 +399,14 @@ export default function RequestCreate() {
 
                     <CardActions align='center' className='card_action'>
                         <Grid container p={1} justifyContent='flex-end'>
-                            <Grid item xs={6} md={2} align='end' p={1}>
+                            <Grid item align='end' p={1}>
+                                <Button variant='outlined' color='secondary' onClick={() => navigate('/')}>Закрыть</Button>
+                            </Grid>
+                            <Grid item align='end' p={1}>
                                 <Button variant='outlined' onClick={() => reset()} color='error'>Очистить</Button>
                             </Grid>
 
-                            <Grid item xs={6} md={2} align='start' p={1}>
+                            <Grid item align='start' p={1}>
                                 <Button variant='outlined' color='success' type='submit'>Создать</Button>
                             </Grid>
                         </Grid>

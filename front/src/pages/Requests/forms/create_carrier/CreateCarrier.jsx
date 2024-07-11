@@ -18,7 +18,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
 
 
     const fetch_carriers = () => {
-        api('/api/carriers/').then(res => setCarriers(res.data))
+        api('/api/carriers/').then(res => setCarriers(res?.data))
     }
 
     const fetch_request_carriers = () => {

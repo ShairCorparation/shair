@@ -50,7 +50,7 @@ export default function Requests({ setAlertInfo }) {
         fetch_requests()
         get_user_info()
         setLoader(false)
-    }, [])
+    }, [loader])
 
     React.useEffect(() => {
         if (executor !== null) {

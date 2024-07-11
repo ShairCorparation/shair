@@ -32,8 +32,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const { register, trigger, control, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
 
-    const [clients, setClients] = React.useState(null)
-    const [carriers, setCarriers] = React.useState(null)
+    const [clients, setClients] = React.useState([])
+    const [carriers, setCarriers] = React.useState([])
     const [req, setReq] = React.useState()
     const [open, setOpen] = React.useState(false);
 
@@ -61,16 +61,6 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
 
 
     React.useEffect(() => {
-
-        api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data)
-        })
-
-        api('/api/countries/').then((res) => {
-            setCountries([...JSON.parse(res.data)['countries']])
-            setCities([...JSON.parse(res.data)['cities']])
-        })
-
         api(`/api/requests/${request.id}/`, 'GET').then((res) => {
             setReq(res.data)
             setValue('country_of_dispatch', res.data.country_of_dispatch)
@@ -79,10 +69,31 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             setValue('city_of_dispatch', res.data.city_of_dispatch)
             setValue('delivery_city', res.data.delivery_city)
         })
-        if (point !== '') {
-            api(`/api/request_carriers/`, 'GET', {}, false, {params: {'request_id': request.id}}).then((res) => { setCarriers(res.data) })
-        }
+        
     }, [])
+
+    React.useEffect(()=> {
+        if (point !== '' && carriers.length === 0) {
+            api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => { setCarriers(res.data) })
+        }
+    }, [carriers])
+
+    React.useEffect(() => {
+        if (countries?.length === 0) {
+            api('/api/countries/').then((res) => {
+                setCountries([...JSON.parse(res.data)['countries']])
+                setCities([...JSON.parse(res.data)['cities']])
+            })
+        }
+    }, [countries])
+
+    React.useEffect(() => {
+        if (clients.length === 0) {
+            api('/api/clients/', 'GET').then((res) => {
+                setClients(res.data)
+            })
+        }
+    }, [clients])
 
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
