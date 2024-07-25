@@ -44,19 +44,28 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
 
 
     const handleSave = (form_data) => {
-
         let delivery = form_data.date_of_delivery
         let dispatch = form_data.date_of_shipment
         form_data.date_of_delivery = `${delivery.getFullYear()}-${delivery.getMonth() + 1}-${delivery.getDate()}`
         form_data.date_of_shipment = `${dispatch.getFullYear()}-${dispatch.getMonth() + 1}-${dispatch.getDate()}`
 
-        api(`/api/requests/${request.id}/`, 'PATCH', form_data)
+        if (point !== 'duplicate') {
+            api(`/api/requests/${request.id}/`, 'PATCH', form_data)
+                .then((res) => {
+                    setAlertInfo({ open: true, color: 'success', message: res.data.message })
+                    setLoader(true)
+                })
+                .catch((err) => {
+                })
+        }
+        else {
+            api(`/api/requests/`, 'POST', form_data)
             .then((res) => {
-                setAlertInfo({ open: true, color: 'success', message: res.data.message })
-                setLoader(true)
+                window.location.href = '/'
             })
             .catch((err) => {
             })
+        }
     }
 
 
@@ -69,11 +78,11 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             setValue('city_of_dispatch', res.data.city_of_dispatch)
             setValue('delivery_city', res.data.delivery_city)
         })
-        
+
     }, [])
 
-    React.useEffect(()=> {
-        if (point !== '' && carriers.length === 0) {
+    React.useEffect(() => {
+        if (point !== '' && point !== 'duplicate' && carriers.length === 0) {
             api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => { setCarriers(res.data) })
         }
     }, [carriers])
@@ -134,7 +143,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                 open={openDialog}
             >
                 <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-                    Обновление запроса
+                    {point === 'duplicate' ? 'Создать запрос' : 'Обновить запрос'}
                 </DialogTitle>
                 <IconButton
                     aria-label="close"
@@ -151,7 +160,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                 <DialogContent dividers className='dialog_content'>
                     <Card sx={{ width: '90%', marginBottom: '10px', overflow: 'auto !important' }} elevation={10}>
                         <form onSubmit={handleSubmit(handleSave)} className='edit_request'>
-                            <CardHeader title='Обновление запроса' align='center' sx={{ marginTop: '20px' }} />
+                            <CardHeader title={point === 'duplicate' ? 'Создать запрос' : 'Обновить запрос'}
+                                align='center' sx={{ marginTop: '20px' }} />
                             {req &&
                                 <CardContent>
                                     <Grid container justifyContent='center'>
@@ -493,7 +503,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                             </Grid>
 
 
-                                            {carriers &&
+                                            {carriers && point !== 'duplicate' &&
                                                 <Grid item xs={12} mb={1} mt={1} p={1}>
                                                     <FormControl sx={{ width: '100%' }} size="small">
                                                         <InputLabel id="demo-simple-select-label">Перевозчики</InputLabel>
@@ -523,7 +533,9 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                 <Grid container p={1} justifyContent='flex-end'>
 
                                     <Grid item xs={6} md={2} align='start' p={1}>
-                                        <Button variant='outlined' color='success' type='submit'>Обновить запрос</Button>
+                                        <Button variant='outlined' color='success' type='submit'>
+                                            {point === 'duplicate' ? 'Создать запрос' : 'Обновить запрос'}
+                                        </Button>
                                     </Grid>
                                 </Grid>
                             </CardActions>

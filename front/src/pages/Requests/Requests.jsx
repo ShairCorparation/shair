@@ -17,7 +17,6 @@ import RequestEdit from './forms/edit_form/RequestEdit';
 import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
 import { api } from '../../api/api';
 import './requests.css'
-import createMixins from '@mui/material/styles/createMixins';
 
 
 export default function Requests({ setAlertInfo }) {
@@ -33,6 +32,8 @@ export default function Requests({ setAlertInfo }) {
     const [executor, setExecutor] = React.useState(null)
 
     const [userInfo, setUserInfo] = React.useState(null)
+
+    const [editPoint, setEditPoint] = React.useState('')
 
 
     React.useEffect(() => {
@@ -180,6 +181,16 @@ export default function Requests({ setAlertInfo }) {
                                             <DeleteIcon color='error' />
                                         </IconButton>
                                     </Tooltip>
+                                    
+                                    <br />
+                                    <Button variant='contained' color='secondary'
+                                        onClick={() => {
+                                            setEditDialog(true)
+                                            setCurrentReq(req)
+                                            setEditPoint('duplicate')
+                                        }}>
+                                        Дублировать
+                                    </Button>
 
                                 </TableCell>
                             </TableRow>
@@ -195,7 +206,7 @@ export default function Requests({ setAlertInfo }) {
                     <TakeToJob setOpen={setTakeToJobDialog} open={takeToJobDialog} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
                     <ChangeDesc setOpen={setChangeDesc} open={changeDesc} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
                     <DeleteRequest setOpen={setDeleteRequest} open={deleteRequest} currentReq={currentReq} setLoader={setLoader} setAlertInfo={setAlertInfo} setCurrentReq={setCurrentReq} />
-                    <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={currentReq} setLoader={setLoader} setCurrentReq={setCurrentReq} />
+                    <RequestEdit openDialog={editDialog} setOpenDialog={setEditDialog} request={currentReq} point={editPoint} setLoader={setLoader} setCurrentReq={setCurrentReq} />
                     <CreateCarrier open={carrierDialog} setOpen={setCarrierDialog} request={currentReq} setCurrentReq={setCurrentReq} setLoader={setLoader} />
                 </React.Fragment>
             }

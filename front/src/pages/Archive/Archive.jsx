@@ -11,6 +11,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import DocForm from '../Orders/forms/docs_dialog/doc_form';
 import ChangeDesc from '../Requests/forms/change_desc/ChangeDesc';
 import ExecutorFilter from '../../components/Filters/ExecutorFilter/ExecutorFilter';
+import RequestEdit from '../Requests/forms/edit_form/RequestEdit';
 import { useEffect } from 'react'
 import { api } from '../../api/api'
 import axios from 'axios';
@@ -24,6 +25,8 @@ export default function Archive() {
 
     const [executor, setExecutor] = React.useState(null)
     const [userInfo, setUserInfo] = React.useState(null)
+
+    const [openEditDialog, setOpenEditDialog] = React.useState(false)
 
     const [EUR, setEUR] = React.useState(0)
     const [USD, setUSD] = React.useState(0)
@@ -169,6 +172,15 @@ export default function Archive() {
                                             checkedIcon={<LocalShippingIcon color='success' />}
                                         />
                                     </Tooltip>
+                                    <br />
+
+                                    <Button variant='contained' color='secondary'
+                                        onClick={() => {
+                                            setOpenEditDialog(true)
+                                            setCureReq(req)
+                                        }}>
+                                        Дублировать
+                                    </Button>
 
                                 </TableCell>
 
@@ -182,6 +194,7 @@ export default function Archive() {
                 <React.Fragment>
                     <DocForm doc_dialog={doc_dialog} setDocDialog={setDocDialog} curr_req={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
                     <ChangeDesc open={changeDesc} setOpen={setChangeDesc} currentReq={curr_req} setAlertInfo={setAlertInfo} setCurrentReq={setCureReq} purpose={'archive'} />
+                    <RequestEdit request={curr_req} openDialog={openEditDialog} setOpenDialog={setOpenEditDialog} point='duplicate' setCurrentReq={setCureReq}/>
                 </React.Fragment>
             }
 
