@@ -131,7 +131,7 @@ export default function Archive() {
                                     {Number(convertCurrency(req.customer_price, req.currency) - convertCurrency(req.carrier.carrier_rate, req.carrier.carrier_currency)).toFixed(2)} BYN
                                 </TableCell>
                                 <TableCell align="left">
-                                    {req.carrier.contact_person}
+                                    {req.carrier.company_name}
                                     <br />
                                     {req.carrier.contact_info}
                                 </TableCell>
