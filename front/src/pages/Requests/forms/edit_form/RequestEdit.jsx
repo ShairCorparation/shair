@@ -503,7 +503,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                             </Grid>
 
 
-                                            {carriers && point !== 'duplicate' &&
+                                            {carriers?.length> 0 && point !== 'duplicate' &&
                                                 <Grid item xs={12} mb={1} mt={1} p={1}>
                                                     <FormControl sx={{ width: '100%' }} size="small">
                                                         <InputLabel id="demo-simple-select-label">Перевозчики</InputLabel>
