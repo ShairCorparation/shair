@@ -79,7 +79,7 @@ class RequestCarrier(models.Model):
 class Carrier(models.Model):
     created_date = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     company_name = models.CharField(max_length=256, verbose_name='Название компании')
-    contact_person = models.CharField(max_length=32, verbose_name='Контактное лицо')
+    contact_person = models.CharField(max_length=256, verbose_name='Контактное лицо')
     unp = models.CharField(max_length=256, unique=True, verbose_name='УНП',
                            error_messages={'unique': 'Перевозчик с таким УНП уже существует.'})
     contact_info = models.CharField(max_length=256, verbose_name='Контактная информация')
