@@ -20,29 +20,39 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
     const handleClose = () => {
         setOpen(false);
         setCurrentReq(null)
+        setLoader(true)
     };
 
-
-    const handleSave = (form_data) => {
-
-        api(`/api/request_carriers/${form_data.carrier}/`, 'PATCH', {
+    const update_carrier = async (carrier) => {
+        await api(`/api/request_carriers/${carrier}/`, 'PATCH', {
             'carrier_rate': rate,
             'carrier_currency': currency
         })
-        const data = { carrier: form_data.carrier, status: 'on it'}
-        api(`/api/requests/${currentReq.id}/take_to_job/`, 'PATCH', data)
+    }
+
+    const update_request = async (data) => {
+        await api(`/api/requests/${currentReq.id}/take_to_job/`, 'PATCH', data)
             .then((res) => {
                 setAlertInfo({ open: open, color: 'success', message: res.data.message })
-                setLoader(true)
-                handleClose()
             })
             .catch((err) => {
                 setAlertInfo({ open: open, color: 'error', message: err.response.data.unp[0] })
             })
     }
 
+    const handleSave = (form_data) => {
+        const data = { carrier: form_data.carrier, status: 'on it' }
+        const update_data = async () => {
+            await update_carrier(form_data.carrier)
+            await update_request(data)
+            handleClose()
+        }
+
+        update_data()
+    }
+
     useEffect(() => {
-        setCarriers(currentReq.carrier_list) 
+        setCarriers(currentReq.carrier_list)
         setLoaderCarrier(false)
     }, [loadCarrier, currentReq])
 
@@ -73,10 +83,10 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                                 >
                                     {carriers && carriers.map((carrier) => (
                                         <MenuItem value={carrier.id}
-                                            onClick={()=> {
+                                            onClick={() => {
                                                 setRate(carrier.carrier_rate)
                                                 setCurrency(carrier.carrier_currency)
-                                                }}
+                                            }}
                                         >
                                             {carrier.company_name}, {carrier.contact_person}
                                         </MenuItem>
@@ -94,38 +104,36 @@ export default function TakeToJob({ setOpen, open, currentReq, setLoader, setAle
                                 label="Итого лучшая ставка"
                                 placeholder="Итого лучшая ставка"
                                 value={rate}
-                                onChange={(e) => {setRate(e.target.value)}}
+                                onChange={(e) => { setRate(e.target.value) }}
                             />
-
                         </Grid>
 
                         <Grid item xs={12} md={6} pt={1} align='end'>
                             <FormControl sx={{ width: '99%' }} size="small">
                                 <InputLabel id="demo-simple-select-label">Валюта</InputLabel>
-                                
-                                        <Select 
-                                            className="select_field_edit_page"
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            label="Валюта"
-                                            value={currency}
-                                            onChange={(value) => {setCurrency(value.target.value)}}
-                                        >
-                                            <MenuItem value={'USD'}>USD</MenuItem>
-                                            <MenuItem value={'EUR'}>EUR</MenuItem>
-                                            <MenuItem value={'BYN'}>BYN</MenuItem>
-                                            <MenuItem value={'RUB'}>RUB</MenuItem>
-                                        </Select>
-                                    
+
+                                <Select
+                                    className="select_field_edit_page"
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    label="Валюта"
+                                    value={currency}
+                                    onChange={(value) => { setCurrency(value.target.value) }}
+                                >
+                                    <MenuItem value={'USD'}>USD</MenuItem>
+                                    <MenuItem value={'EUR'}>EUR</MenuItem>
+                                    <MenuItem value={'BYN'}>BYN</MenuItem>
+                                    <MenuItem value={'RUB'}>RUB</MenuItem>
+                                </Select>
+
                             </FormControl>
                         </Grid>
-                        
+
 
                     </Grid>
                 </DialogContent>
                 <DialogActions>
                     <Button type='submit' variant='outlined' color='success'>Взять в работу</Button>
-
                 </DialogActions>
             </form>
 

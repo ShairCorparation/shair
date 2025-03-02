@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material';
+import { Grid, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, Pagination } from '@mui/material';
 import { api } from '../../../api/api';
 import ConsumptionFilter from '../filters/ConsumptionFilter';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import axios from 'axios';
-
 
 export default function Consumption() {
     const initial_data = {
@@ -16,54 +14,38 @@ export default function Consumption() {
     const [sendFilter, setSendFilter] = useState(false)
     const [filterOpen, setFilterOpen] = useState(false)
 
-    const [EUR, setEUR] = React.useState(0)
-    const [USD, setUSD] = React.useState(0)
-    const [RUB, setRUB] = React.useState(0)
+    const [data, setData] = useState(null)
 
-    const [carriers, setCarriers] = useState(null)
+    const [page, setPage] = useState(1)
+    const [countPage, setCountPage] = useState(0)
 
-    useEffect(() => {
-        api('/api/request_carriers/consumption/', 'GET', {}, false, {
+    const get_consumption = async (page_size = null) => {
+        await api('/api/requests/get_consumption/', 'GET', {}, false, {
             params: {
-                request_id: filterData.request_id,
-                name_of_cargo: filterData.name_of_cargo,
-                date_of_shipment: filterData.date_of_shipment,
-                date_of_delivery: filterData.date_of_delivery
+                ...filterData,
+                page: page_size ? page_size : 1
             }
         }).then((res) => {
-            setCarriers(res.data)
+            setPage(page_size ? page_size : 1)
+            setCountPage(res.data.total_pages)
+            setData(res.data.results)
         })
-    }, [sendFilter])
-
+    }
 
     useEffect(() => {
-        api('/api/request_carriers/consumption/').then((res) => {
-            setCarriers(res.data)
-        })
+        get_consumption()
 
-        const loadCurrency = async (name) => {
-            await axios.get(`https://api.nbrb.by/exrates/rates/${name}UR?parammode=2`).then((res) => {
-
-                name === 'EUR' && setEUR(res.data.Cur_OfficialRate)
-                name === 'USD' && setUSD(res.data.Cur_OfficialRate)
-                name === 'RUB' && setRUB(res.data.Cur_OfficialRate)
-
-            })
-        }
-
-        loadCurrency('EUR')
-        loadCurrency('USD')
-        loadCurrency('RUB')
     }, [])
 
-    const convertCurrency = (amount, currency) => {
-        let res
-        currency === 'USD' && (res = amount * USD)
-        currency === 'EUR' && (res = amount * EUR)
-        currency === 'RUB' && (res = amount * RUB / 100)
-        currency === 'BYN' && (res = amount)
-        return res.toFixed(2);
-    };
+    useEffect(() => {
+        data &&
+            get_consumption()
+    }, [sendFilter])
+
+    const handleChangePage = (e, v) => {
+        setPage(v)
+        get_consumption(v)
+    }
 
     return (
         <Grid container item justifyContent='center' >
@@ -85,21 +67,27 @@ export default function Consumption() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {carriers?.map((carrier) => (
+                            {data?.map((el) => (
                                 <TableRow
-                                    key={carrier?.id}
+                                    key={el?.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
-                                    <TableCell align="left" component="th" scope="row">{carrier?.company_name}</TableCell>
-                                    <TableCell align="left">{convertCurrency(carrier?.carrier_rate, carrier?.carrier_currency)} BYN</TableCell>
+                                    <TableCell align="left" component="th" scope="row">{el?.carrier?.company_name}</TableCell>
+                                    <TableCell align="left">
+                                        {el?.sum_eur && `${el.sum_eur} EUR; `}
+                                        {el?.sum_usd && `${el.sum_usd} USD; `}
+                                        {el?.sum_rub && `${el.sum_rub} RUB; `}
+                                        {el?.sum_byn && `${el.sum_byn} BYN; `}
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>
+                <Grid container p={1} justifyContent={'flex-end'}>
+                    <Pagination shape="rounded" variant='outlined' color='secondary' page={page} count={countPage} onChange={handleChangePage} />
+                </Grid>
             </Grid>
-
-
         </Grid>
     )
 }

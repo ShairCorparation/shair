@@ -33,6 +33,8 @@ class Request(models.Model):
     payment_from_carrier = models.BooleanField(default=False, verbose_name='Оплата от перевозчика')
     payment_from_client = models.BooleanField(default=False, verbose_name='Оплата от заказчика')
     
+    receive_doc_date = models.DateTimeField(default=None, null=True, blank=True, verbose_name='Дата получения документов')
+    
     class Meta:
         verbose_name = 'Запросы и Заказы'
         verbose_name_plural = 'Запросы и Заказы'

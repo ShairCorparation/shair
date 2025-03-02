@@ -91,7 +91,6 @@ export default function CreateClient({ setOpen, open, setClients }) {
                 </DialogContent>
                 <DialogActions>
                     <Button type='submit' variant='outlined' color='success'>Сохранить</Button>
-
                 </DialogActions>
             </form>
             <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo}/>

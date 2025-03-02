@@ -18,10 +18,9 @@ export default function Profile() {
     }, [])
 
     const logout = () => {
-        api(`/auth/logout/`, 'POST', {refresh: localStorage.getItem('refresh_token')}).then(()=> {
+        api(`/auth/logout/`, 'POST', { refresh: localStorage.getItem('refresh_token') }).then(() => {
             removeStorageAndGoToLogin()
         })
-        
     }
 
     return (
@@ -35,7 +34,7 @@ export default function Profile() {
                 </Grid>
             </Grid>
             <ChangePassword setAlertInfo={setAlertInfo} />
-            {user?.is_staff && <AddNewUser setAlertInfo={setAlertInfo} currentUser={user}/>}
+            {user?.is_staff && <AddNewUser setAlertInfo={setAlertInfo} currentUser={user} />}
 
 
             <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />

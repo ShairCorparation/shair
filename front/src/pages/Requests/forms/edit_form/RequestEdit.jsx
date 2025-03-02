@@ -17,7 +17,6 @@ import FormError from '../../../../components/FormError/FormError';
 import ErrorMessage from '../../../../components/ErrorMesage/ErrorMesage';
 import '../create_form/request_create.css'
 
-
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -26,7 +25,6 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
         padding: theme.spacing(1),
     },
 }));
-
 
 export default function RequestEdit({ request, openDialog, setOpenDialog, point = '', setLoader, setCurrentReq }) {
     const { register, trigger, control, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
@@ -41,7 +39,6 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const [cities, setCities] = React.useState([])
     const [valueCountry, setValueCountry] = React.useState()
     const [valueCity, setValueCity] = React.useState()
-
 
     const handleSave = (form_data) => {
         let delivery = form_data.date_of_delivery
@@ -68,41 +65,39 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
         }
     }
 
-
-    React.useEffect(() => {
-        api(`/api/requests/${request.id}/`, 'GET').then((res) => {
+    const fetch_request = async () => {
+        await api(`/api/requests/${request.id}/`, 'GET').then((res) => {
             setReq(res.data)
             setValue('country_of_dispatch', res.data.country_of_dispatch)
             setValue('delivery_country', res.data.delivery_country)
-
             setValue('city_of_dispatch', res.data.city_of_dispatch)
             setValue('delivery_city', res.data.delivery_city)
         })
+    }
 
+    const get_countries = async () => {
+        await api('/api/countries/').then((res) => {
+            setCountries([...JSON.parse(res.data)['countries']])
+            setCities([...JSON.parse(res.data)['cities']])
+        })
+    }
+
+    const get_clients = async () => {
+        api('/api/clients/', 'GET').then((res) => {
+            setClients(res.data)
+        })
+    }
+
+    const get_carriers = async () => {
+        api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => { setCarriers(res.data) })
+    }
+
+    React.useEffect(() => {
+        fetch_request()
+        get_countries()
+        get_clients()
+        point !== '' && point !== 'duplicate' && get_carriers()
     }, [])
-
-    React.useEffect(() => {
-        if (point !== '' && point !== 'duplicate' && carriers.length === 0) {
-            api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => { setCarriers(res.data) })
-        }
-    }, [carriers])
-
-    React.useEffect(() => {
-        if (countries?.length === 0) {
-            api('/api/countries/').then((res) => {
-                setCountries([...JSON.parse(res.data)['countries']])
-                setCities([...JSON.parse(res.data)['cities']])
-            })
-        }
-    }, [countries])
-
-    React.useEffect(() => {
-        if (clients.length === 0) {
-            api('/api/clients/', 'GET').then((res) => {
-                setClients(res.data)
-            })
-        }
-    }, [clients])
 
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -111,9 +106,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             }
         }, 350);
         return () => clearTimeout(timeoutId);
-
     }, [valueCountry]);
-
 
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -121,21 +114,16 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                 setCities([...cities, valueCity])
             }
         }, 350);
-
         return () => clearTimeout(timeoutId);
-
     }, [valueCity])
-
 
     const handleClose = () => {
         setOpenDialog(false);
         setCurrentReq(null)
     };
 
-
     return (
         <Grid container justifyContent='center'>
-
             <BootstrapDialog
                 className='dialog_container'
                 onClose={handleClose}
@@ -544,7 +532,6 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                     </Card>
                     <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />
                 </DialogContent>
-
             </BootstrapDialog>
         </Grid>
     )

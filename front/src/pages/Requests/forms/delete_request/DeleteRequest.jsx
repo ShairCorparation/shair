@@ -60,10 +60,8 @@ export default function DeleteRequest({ setOpen, open, currentReq, setLoader, se
                 </DialogContent>
                 <DialogActions>
                     <Button type='submit' variant='outlined' color='error'>Удалить {point === '' ? 'запрос' : 'заказ'}</Button>
-
                 </DialogActions>
             </form>
-
         </Dialog>
     )
 }

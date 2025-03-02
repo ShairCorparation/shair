@@ -9,7 +9,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from app.helpers import get_currencies
-from back.filters import user_filters
 from app.models import Request
 from back import serializers, models
 from django.contrib.auth.models import User
@@ -75,7 +74,7 @@ class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSe
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return user_filters(self.request, User.objects.all())
+        return User.objects.all()
     
     def list(self, request, *args, **kwargs):
         serializer = self.serializer_class(self.get_queryset(), many=True)
@@ -99,22 +98,6 @@ class UserViewSet(mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSe
         instance.save()
         return Response({'message': 'Пароль был успешно изменен!'}, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['GET'])
-    def overcomes(self, request, *args, **kwargs):
-        currency_data = get_currencies()
-        executors_id = Request.objects.filter(status='on it').values_list('executor', flat=True)
-        print(executors_id)
-        serializer = serializers.OvercomesUserSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    @action(detail=False, methods=['GET'])
-    def fines(self, request, *args, **kwargs):
-        currency_data = get_currencies()
-        executors_id = Request.objects.filter(status='on it', payment_from_client=False, payment_from_carrier=False).values_list('executor', flat=True)
-        serializer = serializers.ExecutorFinesSerializer(self.get_queryset().filter(pk__in=executors_id), many=True, context=currency_data)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class ProfileViewSet(mixins.ListModelMixin, mixins.UpdateModelMixin, GenericViewSet):
     
     serializer_class = serializers.ProfileSerializer

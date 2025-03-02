@@ -16,25 +16,28 @@ import Profile from '../Profile/Profile';
 import Archive from '../Archive/Archive';
 import { useState, useEffect } from 'react'
 import { api } from '../../api/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import logo from '../assets/images/logo.png'
 import './main-page.css'
 
 
 export default function MainPage() {
     const [alertInfo, setAlertInfo] = useState({ open: false, color: '', message: '' });
-    const [value, setValue] = useState('requests');
+    const { pathname } = useLocation()
+    
+    const navigate = useNavigate()
     const [user, set_user] = useState()
     const [loader, setLoader] = useState(true)
 
 
     useEffect(() => {
-        async function get_current_user() {
+        const get_current_user = async () => {
             await api('/auth/users_info/current_user/').then((res) => {
                 set_user(res.data)
                 setLoader(false)
-            })
+            }).catch(err => {})
         }
-        get_current_user()
-             
+        get_current_user() 
     }, [])
 
     return (
@@ -44,48 +47,51 @@ export default function MainPage() {
             </Box>
             :
             <Grid container>
+                
                 <Box sx={{ width: '-webkit-fill-available' }} >
                     <BottomNavigation
                         className='box_panel_navigation'
                         showLabels
-                        value={value}
+                        value={pathname}
                         onChange={(event, newValue) => {
-                            setValue(newValue);
+                            navigate(`${newValue}`)
                         }}
                     >
-                        <BottomNavigationAction label="Запросы" className={value==='requests' ? 'active_requests' : 'requests'} 
-                            value='requests' icon={<ForumRoundedIcon />} />
+                        <img src={logo} alt="logo" width={'inherit'} style={{marginRight: '30px'}}/>
 
-                        <BottomNavigationAction label="Заказы" className={value==='orders' ? 'active_orders' : 'orders'}
-                            value='orders' icon={<AssignmentRoundedIcon />} />
+                        <BottomNavigationAction label="Запросы" className={pathname==='/requests' ? 'active_requests' : 'requests'} 
+                            value='/requests' icon={<ForumRoundedIcon />} />
 
-                        <BottomNavigationAction label="Клиенты" className={value==='clients' ? 'active_clients' : 'clients'}
-                            value='clients' icon={<HandshakeRoundedIcon />} />
+                        <BottomNavigationAction label="Заказы" className={pathname==='/orders' ? 'active_orders' : 'orders'}
+                            value='/orders' icon={<AssignmentRoundedIcon />} />
 
-                        <BottomNavigationAction label="Перевозчики" className={value==='carriers' ? 'active_carriers' : 'carriers'}
-                            value='carriers' icon={<LocalShippingRoundedIcon />} />
+                        <BottomNavigationAction label="Клиенты" className={pathname==='/clients' ? 'active_clients' : 'clients'}
+                            value='/clients' icon={<HandshakeRoundedIcon />} />
+
+                        <BottomNavigationAction label="Перевозчики" className={pathname==='/carriers' ? 'active_carriers' : 'carriers'}
+                            value='/carriers' icon={<LocalShippingRoundedIcon />} />
                         {user?.is_staff && 
-                            <BottomNavigationAction label="Отчеты" className={value==='reports' ? 'active_reports' : 'reports'}
-                                value='reports' icon={<ArticleRoundedIcon />} />
+                            <BottomNavigationAction label="Отчеты" className={pathname==='/reports' ? 'active_reports' : 'reports'}
+                                value='/reports' icon={<ArticleRoundedIcon />} />
                         }
 
-                        <BottomNavigationAction label="Архив" className={value==='archive' ? 'active_archive' : 'archive'}
-                            value='archive' icon={<ImportContactsIcon />} />
+                        <BottomNavigationAction label="Архив" className={pathname==='/archive' ? 'active_archive' : 'archive'}
+                            value='/archive' icon={<ImportContactsIcon />} />
                         
-                        <BottomNavigationAction label="Профиль" className={value==='profile' ? 'active_profile' : 'profile'}
-                            value='profile' icon={<AccountCircleIcon />} />
+                        <BottomNavigationAction label="Профиль" className={pathname==='/profile' ? 'active_profile' : 'profile'}
+                            value='/profile' icon={<AccountCircleIcon />} />
 
                     </BottomNavigation>
                 </Box>
                 <Grid container item xs={12} p={1} className='main_container'>
 
-                    {value === 'requests' && <Requests setAlertInfo={setAlertInfo}/>}
-                    {value === 'orders' && <Orders />}
-                    {value === 'clients' && <Clients />}
-                    {value === 'carriers' && <Carriers />}
-                    {value === 'reports' && <Reports /> }
-                    {value === 'archive' && <Archive /> }
-                    {value === 'profile' && <Profile /> }
+                    {pathname === '/requests' && <Requests setAlertInfo={setAlertInfo}/>}
+                    {pathname === '/orders' && <Orders />}
+                    {pathname === '/clients' && <Clients />}
+                    {pathname === '/carriers' && <Carriers />}
+                    {pathname === '/reports' && <Reports /> }
+                    {pathname === '/archive' && <Archive /> }
+                    {pathname === '/profile' && <Profile /> }
                 </Grid>
                 <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />
             </Grid>

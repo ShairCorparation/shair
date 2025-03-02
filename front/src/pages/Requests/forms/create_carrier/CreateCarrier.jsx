@@ -16,13 +16,12 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     const [currentCarrier, setCurrentCarrier] = useState(null)
     const [requestCarriers, setRequestCarriers] = useState([])
 
-
-    const fetch_carriers = () => {
-        api('/api/carriers/').then(res => setCarriers(res?.data))
+    const fetch_carriers = async () => {
+        await api('/api/carriers/').then(res => setCarriers(res?.data))
     }
 
-    const fetch_request_carriers = () => {
-        api('/api/request_carriers/', 'GET', {}, false, {
+    const fetch_request_carriers = async () => {
+        await api('/api/request_carriers/', 'GET', {}, false, {
             params: {
                 'request_id': request.id
             }
@@ -32,13 +31,18 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     }
 
     useEffect(() => {
-        fetch_carriers()
-        fetch_request_carriers()
+        const fetch_data = async () => {
+            await fetch_carriers()
+            await fetch_request_carriers()
+        }
+        
+        fetch_data()
     }, [])
 
     const handleClose = () => {
         setOpen(false);
         setCurrentReq(null)
+        setLoader(true)
     };
 
     const put_in_request = () => {
@@ -50,7 +54,6 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                 }).then(res => {
                     setAlertInfo({ open: open, color: 'success', message: res.data.message })
                     fetch_request_carriers()
-                    setLoader(true)
                 }).catch((err) => {
                     setAlertInfo({ open: open, color: 'error', message: 'Перевозчик уже добавлен в данный запрос' })
                 })
@@ -58,11 +61,9 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     }
 
     const delete_carrier = (id) => {
-
         api(`/api/request_carriers/${id}/`, 'DELETE').then(res => {
             setAlertInfo({ open: open, color: 'success', message: res.data.message })
             fetch_request_carriers()
-            setLoader(true)
         })
     }
 
@@ -70,7 +71,6 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
         api('/api/carriers/', 'POST', form_data)
             .then((res) => {
                 reset()
-                setLoader(true)
                 setAlertInfo({ open: open, color: 'success', message: res.data.message })
                 fetch_carriers()
             })
@@ -80,12 +80,13 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     }
 
     const update_carrier = (e, field, id) => {
-        if (e.target.value !== '') {
-            api(`/api/request_carriers/${id}/`, 'PATCH', { [field]: e.target.value }).then(res => {
-                setAlertInfo({ open: open, color: 'success', message: res.data.message })
-                setLoader(true)
-            })
-        }
+        setTimeout(() => {
+            if (e.target.value !== '') {
+                api(`/api/request_carriers/${id}/`, 'PATCH', { [field]: e.target.value }).then(res => {
+                    setAlertInfo({ open: open, color: 'success', message: res.data.message })
+                })
+            }
+        }, 800)
     }
 
     return (
@@ -274,7 +275,6 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                 </DialogContent>
                 <DialogActions>
                     <Button type='submit' variant='outlined' color='success'>Создать перевозчика</Button>
-
                 </DialogActions>
             </form>
             <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />

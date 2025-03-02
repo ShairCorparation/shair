@@ -13,4 +13,5 @@ router.register(r'request_carriers', views.RequestCarrierViewSet, basename='requ
 urlpatterns = [
     path('', include(router.urls)),
     path('countries/', views.get_countries_and_cities),
+    path('get_currency/', views.get_currency)
 ]

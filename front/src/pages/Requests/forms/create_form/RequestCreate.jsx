@@ -27,34 +27,30 @@ export default function RequestCreate() {
     const [valueCity, setValueCity] = useState()
     const navigate = useNavigate()
 
-
     const handleSave = (form_data) => {
-
         api(`/api/requests/`, 'POST', form_data)
             .then((res) => {
-                window.location.href = '/'
-            })
-            .catch((err) => {
+                window.location.href = '/requests'
             })
     }
 
-    useEffect(() => {
-        if (!clients) {
-            api('/api/clients/', 'GET').then((res) => {
-                setClients(res.data)
-            })
-        }
+    const get_clients = async () => {
+        await api('/api/clients/', 'GET').then((res) => {
+            setClients(res.data)
+        })
+    }
 
-    }, [clients])
+    const get_countries_and_cities = async () => {
+        await api('/api/countries/').then((res) => {
+            setCountries([...JSON.parse(res.data)['countries']])
+            setCities([...JSON.parse(res.data)['cities']])
+        })
+    }
 
     useEffect(() => {
-        if (countries.length === 0) {
-            api('/api/countries/').then((res) => {
-                setCountries([...JSON.parse(res.data)['countries']])
-                setCities([...JSON.parse(res.data)['cities']])
-            })
-        }
-    }, [countries])
+        get_clients()
+        get_countries_and_cities()
+    }, [])
 
 
     useEffect(() => {
@@ -62,7 +58,7 @@ export default function RequestCreate() {
             if (valueCountry && !countries.includes(valueCountry)) {
                 setCountries([...countries, valueCountry])
             }
-        }, 350);
+        }, 800);
         return () => clearTimeout(timeoutId);
 
     }, [valueCountry]);
@@ -72,7 +68,7 @@ export default function RequestCreate() {
             if (valueCity && !cities.includes(valueCity)) {
                 setCities([...cities, valueCity])
             }
-        }, 350);
+        }, 800);
 
         return () => clearTimeout(timeoutId);
 

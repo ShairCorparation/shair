@@ -1,3 +1,11 @@
-.btn_table {
-    
+.easy_row {
+    background-color: #ffff0080;
+}
+
+.medium_row {
+    background-color: #ffa5008a;
+}
+
+.hard_row {
+    background-color: #ff000069;
 }

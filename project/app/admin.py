@@ -26,11 +26,11 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Request)
 class RequestAdmin(admin.ModelAdmin):
     inlines = (DocsRequestInline,)
-    list_display = ['name_of_cargo', 'executor', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
+    list_display = ['name_of_cargo', 'executor', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status', 'client']
     list_filter = ['name_of_cargo', 'executor', 'type_of_transport', 'date_of_shipment', 'date_of_delivery', 'status']
 
 
 @admin.register(Carrier)
 class CarrierAdmin(admin.ModelAdmin):
-    list_display = ['company_name', 'contact_person', 'unp', 'contact_info', 'currency']
-    list_filter = ['company_name', 'contact_person', 'unp', 'contact_info', 'currency']
+    list_display = ['company_name', 'contact_person', 'unp', 'contact_info', 'rate', 'currency']
+    list_filter = ['company_name', 'contact_person', 'unp', 'contact_info', 'rate', 'currency']

@@ -6,7 +6,6 @@
 
 .input_container > div > div > input, .input_container > div:nth-child(4) > div > div > input {
     background: white !important;
-    font-size: 12px;
     width: 150px;
 }
 

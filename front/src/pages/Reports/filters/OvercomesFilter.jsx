@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Grid, IconButton, TextField, Button, FormControl, Select, MenuItem } from '@mui/material'
+import { Grid, IconButton, TextField, Button, FormControl, Select, MenuItem, Checkbox, FormControlLabel } from '@mui/material'
 import CancelIcon from '@mui/icons-material/Cancel';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -8,20 +8,19 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import '../../Clients/filters/filter.css'
 import { api } from '../../../api/api';
 
-
 export default function OvercomesFilter({ setFilterData, filterData, setSendFilter, sendFilter, initial_data, setSelector, selector }) {
 
     const [users, setUser] = React.useState(null)
 
-    React.useEffect(()=> {
+    React.useEffect(() => {
         api('/auth/users_info/').then((res) => {
             setUser(res.data)
         })
     }, [])
 
     return (
-        <Grid container item xs={12} p={1}>
-            <Grid container item xs={12} spacing={1} p={1}>
+        <Grid container p={1}>
+            <Grid container spacing={1} p={1}>
                 <Grid item className='selector_container' xs={2} md={1.2} lg={1.6} xl={1.5}>
                     <span>Группировать: </span>
                 </Grid>
@@ -33,18 +32,18 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                             value={selector}
                             onChange={(v) => setSelector(v.target.value)}
                         >
-                            <MenuItem value={'manager'}>по менеджеру</MenuItem>
+                            <MenuItem value={'executor'}>по менеджеру</MenuItem>
                             <MenuItem value={'client'}>по клиенту</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
 
             </Grid>
-            <Grid container item xs={12} spacing={1} p={1}>
+            <Grid container spacing={1} p={1}>
                 <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
                     <IconButton aria-label="delete"
                         onClick={() => {
-                            setFilterData({ ...filterData, request_id: '', company_name: '', executor: ''})
+                            setFilterData({ ...filterData, request_id: '', company_name: '', executor: '' })
                             setSendFilter(!sendFilter)
                         }}
                     >
@@ -71,7 +70,7 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                     </Grid>
                 }
 
-                {selector === 'manager' &&
+                {selector === 'executor' &&
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                         <Select
                             id="demo-select-small"
@@ -82,14 +81,14 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                             {users?.map((user) => (
                                 <MenuItem value={user?.id}>{user?.first_name} {user?.last_name}</MenuItem>
                             ))}
-                            
+
                         </Select>
                     </FormControl>
                 }
 
             </Grid>
 
-            <Grid container item xs={12} spacing={1} p={1}>
+            <Grid container spacing={1} p={1}>
                 <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
                     <IconButton aria-label="delete"
                         onClick={() => {
@@ -129,7 +128,7 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                 </Grid>
             </Grid>
 
-            <Grid container item xs={12} spacing={1} p={1}>
+            <Grid container spacing={1} p={1}>
                 <Grid item xs={2} md={1.2} lg={1.6} xl={1.5}>
                     <IconButton aria-label="delete"
                         onClick={() => {
@@ -162,7 +161,12 @@ export default function OvercomesFilter({ setFilterData, filterData, setSendFilt
                         />
                     </LocalizationProvider>
                 </Grid>
+            </Grid>
 
+            <Grid container p={1}>
+                <FormControlLabel control={
+                    <Checkbox checked={filterData?.include_archive} onChange={(e) => setFilterData({ ...filterData, include_archive: e.target.checked})} />} 
+                    label="учитывать архив" />
             </Grid>
 
             <Grid container item xs={12} spacing={1} p={1} justifyContent='flex-end'>

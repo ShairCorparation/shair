@@ -7,16 +7,47 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import { api } from '../../../api/api';
 import { useEffect, useState } from 'react'
+import Loader from '../../components/Loader'
 
 
 export default function AddNewUser({ setAlertInfo, currentUser }) {
     const { register, formState: { errors }, handleSubmit } = useForm()
     const [users, setUsers] = useState(null)
     const [mode, setMode] = useState(false)
+    const [loader, setLoader] = useState(true)
+
+    const get_users = async () => {
+        await api(`/auth/users_info/`).then((res) => {
+            setUsers(res.data)
+            setLoader(false)
+        })
+    }
+
+    const get_profile = async () => {
+        await api(`/auth/profile/`, 'GET', {}, false, { params: { 'user_id': currentUser.id } }).then(res => {
+            setMode(res.data.is_logistics)
+        })
+    }
+
+    useEffect(() => {
+        const fetch_data = async () => {
+            await get_profile()
+            await get_users()
+        }
+        fetch_data()
+    }, [])
+
+    const handleChange = (e) => {
+        setMode(e.target.checked)
+        api(`/auth/profile/${currentUser.id}/`, 'PATCH', { 'is_logistics': e.target.checked }).then(() => {
+        })
+    }
 
     const handleSave = (form_data) => {
         api(`/auth/register/`, 'POST', form_data).then(() => {
             setAlertInfo({ open: true, color: 'success', message: 'Сотрудник был успешно создан!' })
+            setLoader(true)
+            get_users()
         }).catch((err) => {
 
         })
@@ -25,22 +56,8 @@ export default function AddNewUser({ setAlertInfo, currentUser }) {
     const handleDelete = (user_id) => {
         api(`/auth/users_info/${user_id}/`, 'DELETE').then(() => {
             setAlertInfo({ open: true, color: 'secondary', message: 'Сотрудник был успешно удален!' })
-        })
-    }
-
-    useEffect(() => {
-        api(`/auth/profile/`, 'GET', {}, false, { params: { 'user_id': currentUser.id } }).then(res => {
-            setMode(res.data.is_logistics)
-        })
-
-        api(`/auth/users_info/`).then((res) => {
-            setUsers(res.data)
-        })
-    }, [])
-
-    const handleChange = (e) => {
-        setMode(e.target.checked)
-        api(`/auth/profile/${currentUser.id}/`, 'PATCH', { 'is_logistics': e.target.checked }).then(() => {
+            setLoader(true)
+            get_users()
         })
     }
 
@@ -122,36 +139,38 @@ export default function AddNewUser({ setAlertInfo, currentUser }) {
                 </form>
             </Grid>
 
-            <Grid item component={Paper} xs={12}>
-                <TableContainer component={Paper}>
-                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Имя</TableCell>
-                                <TableCell align="left">Фамилия</TableCell>
-                                <TableCell align="left"></TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {users && users?.map((user) => (
-                                !user?.is_staff &&
-                                <TableRow key={user.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                    <TableCell component="th" scope="row"> {user.first_name}</TableCell>
-                                    <TableCell align="left">{user.last_name}</TableCell>
-                                    <TableCell align="left">
-                                        <Tooltip title="Удалить">
-                                            <IconButton aria-label="delete"
-                                                onClick={() => handleDelete(user.id)}
-                                            >
-                                                <DeleteIcon color='error' />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </TableCell>
+            <Grid item component={Paper} xs={12} position={'relative'}>
+                {loader ? <Loader />
+                    : <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Имя</TableCell>
+                                    <TableCell align="left">Фамилия</TableCell>
+                                    <TableCell align="left"></TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                            </TableHead>
+                            <TableBody>
+                                {users && users?.map((user) => (
+                                    !user?.is_staff &&
+                                    <TableRow key={user.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                        <TableCell component="th" scope="row"> {user.first_name}</TableCell>
+                                        <TableCell align="left">{user.last_name}</TableCell>
+                                        <TableCell align="left">
+                                            <Tooltip title="Удалить">
+                                                <IconButton aria-label="delete"
+                                                    onClick={() => handleDelete(user.id)}
+                                                >
+                                                    <DeleteIcon color='error' />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                }
             </Grid>
         </Grid>
 

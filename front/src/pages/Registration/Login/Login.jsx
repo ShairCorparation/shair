@@ -23,7 +23,7 @@ export default function Login() {
         .then((res) => {
             localStorage.setItem('access_token', res.data.tokens['access'])
             localStorage.setItem('refresh_token', res.data.tokens['refresh'])
-            navigate('/')
+            navigate('/requests')
         })
         .catch(() => {
             setAlertInfo({open: true, color: 'error', message: 'Логин или пароль введены неверно!'})

@@ -8,7 +8,6 @@ import * as React from 'react'
 import { api } from '../../../../api/api';
 import './doc.css'
 
-
 export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertInfo, purpose = '' }) {
 
     const { register, handleSubmit, reset, setValue, control, clearErrors, setError, formState: { errors } } = useForm({
@@ -19,7 +18,6 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
     const [docs, setDocs] = React.useState(null)
     const [loadFiles, setLoadFiles] = React.useState(true)
     const [files, setFiles] = React.useState([]);
-
 
     const handleSave = (form_data) => {
         if (form_data.file === null) {
@@ -40,7 +38,6 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
         setFiles(files.filter((x) => x.id !== id));
         reset()
     };
-
 
     const handleClose = () => {
         setDocDialog(false);
@@ -64,14 +61,13 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
 
     function setDocValue(file) {
         setFiles(file);
-        if (file[0].type === 'application/pdf' || file[0].type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        if (file[0].type === 'application/pdf' || file[0].type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || files[0].type === 'image/png' || files[0].type === 'image/jpeg') {
             setValue('file', file[0].file)
             clearErrors('file')
         }
         else {
-            setError('file', { type: 'custom', message: 'Только PDF или doc/docx!' })
+            setError('file', { type: 'custom', message: 'Только PDF, doc/docx или изображение!' })
         }
-
     }
 
     return (
