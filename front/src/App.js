@@ -19,6 +19,8 @@ function App() {
 
         <Route element={<RequestCreate />} path="/create_request"/>
 
+        <Route element={<Login />} path="*" />
+
       </Routes>
     </BrowserRouter>
   );
