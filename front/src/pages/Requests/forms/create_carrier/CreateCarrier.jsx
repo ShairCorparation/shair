@@ -17,7 +17,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     const [requestCarriers, setRequestCarriers] = useState([])
 
     const fetch_carriers = async () => {
-        await api('/api/carriers/').then(res => setCarriers(res?.data))
+        await api('/api/carriers/').then(res => setCarriers(res?.data.results))
     }
 
     const fetch_request_carriers = async () => {
@@ -25,7 +25,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
             params: {
                 'request_id': request.id
             }
-        }).then(res => {
+        }).then((res) => {
             setRequestCarriers(res.data)
         })
     }

@@ -36,7 +36,7 @@ export default function RequestCreate() {
 
     const get_clients = async () => {
         await api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data)
+            setClients(res.data.results)
         })
     }
 
@@ -96,10 +96,10 @@ export default function RequestCreate() {
                                                 id="combo-box-demo"
                                                 fullWidth
                                                 size='small'
-                                                getOptionLabel={(option) => option.company_name}
+                                                getOptionLabel={(option) => option?.company_name}
                                                 {...register('client', { required: true })}
                                                 onChange={(e, v) => {
-                                                    setValue('client', v.id)
+                                                    setValue('client', v?.id)
                                                     trigger('client')
                                                 }}
                                                 options={clients}

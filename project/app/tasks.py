@@ -10,17 +10,17 @@ def get_currencies():
     data = {}
     for el in res.json():
         if el['Cur_Abbreviation'] == 'USD':
-            data['usd'] = el['Cur_OfficialRate']
+            data['USD'] = el['Cur_OfficialRate']
         if el['Cur_Abbreviation'] == 'EUR':
-            data['eur'] = el['Cur_OfficialRate']
+            data['EUR'] = el['Cur_OfficialRate']
         if el['Cur_Abbreviation'] == 'RUB':
-            data['rub'] = el['Cur_OfficialRate']
+            data['RUB'] = el['Cur_OfficialRate']
 
     if Currency.objects.all().count() > 0:
         cur = Currency.objects.first()
-        cur.USD = data['usd']
-        cur.EUR = data['eur']
-        cur.RUB = data['rub']
+        cur.USD = data['USD']
+        cur.EUR = data['EUR']
+        cur.RUB = data['RUB']
         cur.save()
     else:
         Currency.objects.create(**data)

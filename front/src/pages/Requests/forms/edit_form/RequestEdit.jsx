@@ -31,7 +31,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
 
     const [clients, setClients] = React.useState([])
-    const [carriers, setCarriers] = React.useState([])
+    const [carriers, setCarriers] = React.useState(null)
     const [req, setReq] = React.useState()
     const [open, setOpen] = React.useState(false);
 
@@ -57,11 +57,11 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
         }
         else {
             api(`/api/requests/`, 'POST', form_data)
-            .then((res) => {
-                window.location.href = '/'
-            })
-            .catch((err) => {
-            })
+                .then((res) => {
+                    window.location.href = '/'
+                })
+                .catch((err) => {
+                })
         }
     }
 
@@ -83,20 +83,24 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     }
 
     const get_clients = async () => {
-        api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data)
+        await api('/api/clients/', 'GET').then((res) => {
+            setClients(res.data.results)
         })
     }
 
     const get_carriers = async () => {
-        api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => { setCarriers(res.data) })
+        await api(`/api/request_carriers/`, 'GET', {}, false, { params: { 'request_id': request.id } }).then((res) => {
+            setCarriers(res.data)
+        })
     }
 
     React.useEffect(() => {
         fetch_request()
         get_countries()
         get_clients()
-        point !== '' && point !== 'duplicate' && get_carriers()
+        if (point !== '' && point !== 'duplicate') {
+            get_carriers()
+        }
     }, [])
 
     React.useEffect(() => {
@@ -127,6 +131,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             <BootstrapDialog
                 className='dialog_container'
                 onClose={handleClose}
+                maxWidth={'1200px'}
                 aria-labelledby="customized-dialog-title"
                 open={openDialog}
             >
@@ -164,7 +169,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                         <Controller
                                                             control={control}
                                                             name={'client'}
-                                                            defaultValue={req.client.id}
+                                                            defaultValue={req.client?.id}
                                                             rules={{ required: true }}
                                                             render={({ field: { onChange, value } }) => (
                                                                 <Autocomplete
@@ -172,11 +177,12 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                                     size="small"
                                                                     options={clients}
                                                                     onChange={(e, v) => {
-                                                                        setValue('client', v.id)
+                                                                        console.log(v)
+                                                                        setValue('client', v?.id)
                                                                         trigger('client')
                                                                     }}
-                                                                    defaultValue={req.client}
-                                                                    getOptionLabel={(option) => option.company_name}
+                                                                    defaultValue={req?.client}
+                                                                    getOptionLabel={(option) => option?.company_name}
                                                                     renderInput={(params) => (
                                                                         <TextField {...params} className='tab_text_field' label='Клиент' />
                                                                     )}
@@ -491,7 +497,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                             </Grid>
 
 
-                                            {carriers?.length> 0 && point !== 'duplicate' &&
+                                            {carriers && point !== 'duplicate' &&
                                                 <Grid item xs={12} mb={1} mt={1} p={1}>
                                                     <FormControl sx={{ width: '100%' }} size="small">
                                                         <InputLabel id="demo-simple-select-label">Перевозчики</InputLabel>
