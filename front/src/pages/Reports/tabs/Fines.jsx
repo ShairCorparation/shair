@@ -24,18 +24,39 @@ export default function Fines() {
 
     const [page, setPage] = React.useState(1)
     const [countPage, setCountPage] = React.useState(0)
+    const [requestLoading, setRequestLoading] = useState(true)
 
-    const get_dialog_data = (id, currency) => {
-        api(`/api/requests/on_it/`, 'GET', {}, false, {
-            params: {
-                ...selector === 'client' ? { client_id: id } : { executor: id },
-                ...filterData,
-                currency: currency,
-                payment_from_client: false
+
+    const get_dialog_data = async (id, currency) => {
+        let page = 1
+        let hasMorePages = true
+        let allRequests = [];
+
+        while (hasMorePages) {
+            const res = await api('/api/requests/on_it/', 'GET', {}, false, {
+                params: {
+                    ...filterData,
+                    ...selector === 'client' ? { client_id: id } : { executor: id },
+                    page: page,
+                    currency: currency,
+                    payment_from_client: false
+                }
+            })
+
+            if (res.status === 200) {
+                allRequests = [...allRequests, ...res?.data.results];
+                if (res?.data.total_pages === page) {
+                    hasMorePages = false
+                }
+                else {
+                    page += 1
+                }
+            } else {
+                hasMorePages = false
             }
-        }).then(res => {
-            setDialogData(res.data.results)
-        })
+        }
+        setDialogData(allRequests)
+        setRequestLoading(false)
     }
 
     const get_fines = async (page_size=null) => {
@@ -129,7 +150,7 @@ export default function Fines() {
                 </Grid>
             </Grid>
 
-            {openDialog && <InfoRequestDialog open={openDialog} setOpen={setOpenDialog} title={`Просмотр заявок входящие в сумму ${dialogTitle}`} dialogData={dialogData} />}
+            {openDialog && <InfoRequestDialog open={openDialog} setOpen={setOpenDialog} title={`Просмотр заявок входящие в сумму ${dialogTitle}`} dialogData={dialogData} requestLoading={requestLoading}/>}
         </Grid>
     )
 }

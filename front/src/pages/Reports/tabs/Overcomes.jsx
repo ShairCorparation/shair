@@ -56,13 +56,6 @@ export default function Overcomes() {
 
 
     const get_dialog_data = async (id) => {
-        api(`/api/requests/on_it/`, 'GET', {}, false, {
-            params: {
-                ...filterData,
-                ...selector === 'client' ? { client_id: id } : { executor: id },
-            }
-        }).then(res => setDialogData(res.data.results))
-
         let page = 1
         let hasMorePages = true
         let allRequests = [];
