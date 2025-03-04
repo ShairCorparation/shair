@@ -177,7 +177,6 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                                     size="small"
                                                                     options={clients}
                                                                     onChange={(e, v) => {
-                                                                        console.log(v)
                                                                         setValue('client', v?.id)
                                                                         trigger('client')
                                                                     }}

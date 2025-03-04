@@ -17,7 +17,30 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     const [requestCarriers, setRequestCarriers] = useState([])
 
     const fetch_carriers = async () => {
-        await api('/api/carriers/').then(res => setCarriers(res?.data.results))
+        let page = 1
+        let hasMorePages = true
+        let allCarrier = [];
+
+        while (hasMorePages) {
+            const res = await api('/api/carriers/', 'GET', {}, false, {
+                params: {
+                    page: page
+                }
+            })
+
+            if (res.status === 200) {
+                allCarrier = [...allCarrier, ...res?.data.results];
+                if (res?.data.total_pages === page) {
+                    hasMorePages = false
+                }
+                else {
+                    page += 1
+                }
+            }else {
+                hasMorePages = false
+            }
+        }
+        setCarriers(allCarrier)
     }
 
     const fetch_request_carriers = async () => {
@@ -35,7 +58,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
             await fetch_carriers()
             await fetch_request_carriers()
         }
-        
+
         fetch_data()
     }, [])
 
