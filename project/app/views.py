@@ -83,7 +83,9 @@ class RequestViewSet(
     
     @action(detail=False, methods=['GET'])
     def on_it(self, request, *args, **kwargs):
-        instances = self.get_queryset().filter(status='on it').order_by(self.request.query_params.get('ordering', self.ordering))
+        archive = request.query_params.get('include_archive')
+        req_status = ['on it', 'archived'] if archive == 'true' else ['on it']
+        instances = self.get_queryset().filter(status__in=req_status).order_by(self.request.query_params.get('ordering', self.ordering))
         page = self.paginate_queryset(instances)
         serializer = serializers.OrdersSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)

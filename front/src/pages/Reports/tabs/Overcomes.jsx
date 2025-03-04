@@ -26,6 +26,8 @@ export default function Overcomes() {
 
     const [page, setPage] = useState(1)
     const [countPage, setCountPage] = useState(0)
+    const [requestLoading, setRequestLoading] = useState(true)
+
 
     const get_overcomes = async (page_size=null) => {
         await api('/api/requests/get_overcomes/', 'GET', {}, false,
@@ -53,13 +55,41 @@ export default function Overcomes() {
     }, [sendFilter, selector])
 
 
-    const get_dialog_data = (id) => {
+    const get_dialog_data = async (id) => {
         api(`/api/requests/on_it/`, 'GET', {}, false, {
             params: {
                 ...filterData,
                 ...selector === 'client' ? { client_id: id } : { executor: id },
             }
         }).then(res => setDialogData(res.data.results))
+
+        let page = 1
+        let hasMorePages = true
+        let allRequests = [];
+
+        while (hasMorePages) {
+            const res = await api('/api/requests/on_it/', 'GET', {}, false, {
+                params: {
+                    ...filterData,
+                    ...selector === 'client' ? { client_id: id } : { executor: id },
+                    page: page
+                }
+            })
+
+            if (res.status === 200) {
+                allRequests = [...allRequests, ...res?.data.results];
+                if (res?.data.total_pages === page) {
+                    hasMorePages = false
+                }
+                else {
+                    page += 1
+                }
+            } else {
+                hasMorePages = false
+            }
+        }
+        setDialogData(allRequests)
+        setRequestLoading(false)
     }
 
     const handleChangePage = (e, v) => {
@@ -145,7 +175,7 @@ export default function Overcomes() {
                 </Grid>
             </Grid>
 
-            {openDialog && <InfoRequestDialog open={openDialog} setOpen={setOpenDialog} title={`Просмотр заявок ${dialogTitle} (${selector === 'client' ? 'клиент' : 'менеджер'})`} dialogData={dialogData} />}
+            {openDialog && <InfoRequestDialog open={openDialog} setOpen={setOpenDialog} title={`Просмотр заявок ${dialogTitle} (${selector === 'client' ? 'клиент' : 'менеджер'})`} dialogData={dialogData} requestLoading={requestLoading}/>}
         </Grid>
     )
 }
