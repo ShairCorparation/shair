@@ -56,6 +56,7 @@ export default function Overcomes() {
     const get_dialog_data = (id) => {
         api(`/api/requests/on_it/`, 'GET', {}, false, {
             params: {
+                ...filterData,
                 ...selector === 'client' ? { client_id: id } : { executor: id },
             }
         }).then(res => setDialogData(res.data.results))

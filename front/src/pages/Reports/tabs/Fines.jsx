@@ -29,6 +29,7 @@ export default function Fines() {
         api(`/api/requests/on_it/`, 'GET', {}, false, {
             params: {
                 ...selector === 'client' ? { client_id: id } : { executor: id },
+                ...filterData,
                 currency: currency,
                 payment_from_client: false
             }
