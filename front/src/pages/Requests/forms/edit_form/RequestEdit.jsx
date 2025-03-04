@@ -39,6 +39,8 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const [cities, setCities] = React.useState([])
     const [valueCountry, setValueCountry] = React.useState()
     const [valueCity, setValueCity] = React.useState()
+    const [clientLoading, setClientLoading] = React.useState(true)
+    
 
     const handleSave = (form_data) => {
         let delivery = form_data.date_of_delivery
@@ -83,9 +85,31 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     }
 
     const get_clients = async () => {
-        await api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data.results)
-        })
+        let page = 1
+        let hasMorePages = true
+        let allClients = [];
+
+        while (hasMorePages) {
+            const res = await api('/api/clients/', 'GET', {}, false, {
+                params: {
+                    page: page
+                }
+            })
+
+            if (res.status === 200) {
+                allClients = [...allClients, ...res?.data.results];
+                if (res?.data.total_pages === page) {
+                    hasMorePages = false
+                }
+                else {
+                    page += 1
+                }
+            } else {
+                hasMorePages = false
+            }
+        }
+        setClients(allClients)
+        setClientLoading(false)
     }
 
     const get_carriers = async () => {
@@ -176,6 +200,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                                                     id="multiple-limit-tags"
                                                                     size="small"
                                                                     options={clients}
+                                                                    loading={clientLoading}
                                                                     onChange={(e, v) => {
                                                                         setValue('client', v?.id)
                                                                         trigger('client')
@@ -533,7 +558,7 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
                                 </Grid>
                             </CardActions>
                         </form>
-                        <CreateClient setOpen={setOpen} open={open} setClients={setClients} />
+                        <CreateClient setOpen={setOpen} open={open} setClients={setClients} setClientLoading={setClientLoading}/>
                     </Card>
                     <ErrorMessage alertInfo={alertInfo} setAlertInfo={setAlertInfo} />
                 </DialogContent>

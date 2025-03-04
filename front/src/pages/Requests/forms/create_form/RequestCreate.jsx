@@ -18,6 +18,7 @@ import './request_create.css'
 
 
 export default function RequestCreate() {
+    const navigate = useNavigate()
     const { register, trigger, control, reset, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
     const [clients, setClients] = useState(null)
     const [open, setOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function RequestCreate() {
     const [cities, setCities] = useState([])
     const [valueCountry, setValueCountry] = useState()
     const [valueCity, setValueCity] = useState()
-    const navigate = useNavigate()
+    const [clientLoading, setClientLoading] = useState(true)
 
     const handleSave = (form_data) => {
         api(`/api/requests/`, 'POST', form_data)
@@ -35,9 +36,31 @@ export default function RequestCreate() {
     }
 
     const get_clients = async () => {
-        await api('/api/clients/', 'GET').then((res) => {
-            setClients(res.data.results)
-        })
+        let page = 1
+        let hasMorePages = true
+        let allClients = [];
+
+        while (hasMorePages) {
+            const res = await api('/api/clients/', 'GET', {}, false, {
+                params: {
+                    page: page
+                }
+            })
+
+            if (res.status === 200) {
+                allClients = [...allClients, ...res?.data.results];
+                if (res?.data.total_pages === page) {
+                    hasMorePages = false
+                }
+                else {
+                    page += 1
+                }
+            } else {
+                hasMorePages = false
+            }
+        }
+        setClients(allClients)
+        setClientLoading(false)
     }
 
     const get_countries_and_cities = async () => {
@@ -96,6 +119,7 @@ export default function RequestCreate() {
                                                 id="combo-box-demo"
                                                 fullWidth
                                                 size='small'
+                                                loading={clientLoading}
                                                 getOptionLabel={(option) => option?.company_name}
                                                 {...register('client', { required: true })}
                                                 onChange={(e, v) => {
@@ -408,7 +432,7 @@ export default function RequestCreate() {
                         </Grid>
                     </CardActions>
                 </form>
-                <CreateClient setOpen={setOpen} open={open} setClients={setClients} />
+                <CreateClient setOpen={setOpen} open={open} setClients={setClients} setClientLoading={setClientLoading}/>
             </Card>
         </Grid>
     )

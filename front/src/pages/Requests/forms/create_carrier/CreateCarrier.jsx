@@ -37,12 +37,12 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                 else {
                     page += 1
                 }
-            }else {
+            } else {
                 hasMorePages = false
             }
         }
-            setCarriers(allCarrier)
-            setCarrierLoading(false)
+        setCarriers(allCarrier)
+        setCarrierLoading(false)
     }
 
     const fetch_request_carriers = async () => {
@@ -98,6 +98,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                 reset()
                 setAlertInfo({ open: open, color: 'success', message: res.data.message })
                 fetch_carriers()
+                setCarrierLoading(true)
             })
             .catch((err) => {
                 setAlertInfo({ open: open, color: 'error', message: err.response.data.unp[0] })

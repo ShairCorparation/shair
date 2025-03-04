@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { api } from '../../../../api/api';
 import FormError from '../../../../components/FormError/FormError';
 
-export default function CreateClient({ setOpen, open, setClients }) {
+export default function CreateClient({ setOpen, open, setClients, setClientLoading }) {
     const { register, reset, handleSubmit, formState: {errors} } = useForm({ mode: 'onSubmit' })
     const [alertInfo, setAlertInfo] = useState({open: false, color: '', message: ''});
 
@@ -18,6 +18,7 @@ export default function CreateClient({ setOpen, open, setClients }) {
         .then((res) => {
             reset()
             setClients(res.data.data)
+            setClientLoading(true)
             setAlertInfo({open: open, color: 'success', message: res.data.message})
         })
         .catch((err) => {
