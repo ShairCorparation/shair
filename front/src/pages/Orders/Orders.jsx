@@ -226,7 +226,7 @@ export default function Orders() {
                                         {Number(convertCurrency(req.customer_price, req.currency, USD, EUR, RUB))} BYN
                                     </TableCell>
                                     <TableCell align="left">
-                                        {Number(convertCurrency(req.customer_price, req.currency, USD, EUR, RUB) - convertCurrency(req.carrier.carrier_rate, req.carrier.carrier_currency, USD, EUR, RUB)).toFixed(2)} BYN
+                                        {Number(convertCurrency(req.customer_price, req.currency, USD, EUR, RUB) - Number(convertCurrency(req.carrier.carrier_rate, req.carrier.carrier_currency, USD, EUR, RUB))).toFixed(2)} BYN
                                     </TableCell>
                                     <TableCell align="left">
                                         {req.carrier.company_name}
