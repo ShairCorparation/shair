@@ -15,6 +15,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
     const [carriers, setCarriers] = useState([])
     const [currentCarrier, setCurrentCarrier] = useState(null)
     const [requestCarriers, setRequestCarriers] = useState([])
+    const [carrierLoading, setCarrierLoading] = useState(true)
 
     const fetch_carriers = async () => {
         let page = 1
@@ -40,7 +41,8 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                 hasMorePages = false
             }
         }
-        setCarriers(allCarrier)
+            setCarriers(allCarrier)
+            setCarrierLoading(false)
     }
 
     const fetch_request_carriers = async () => {
@@ -131,6 +133,7 @@ export default function CreateCarrier({ setOpen, open, request, setCurrentReq, s
                                 <Autocomplete
                                     disablePortal
                                     id="combo-box-demo"
+                                    loading={carrierLoading}
                                     fullWidth
                                     size='small'
                                     getOptionLabel={(option) => `${option.company_name} ${option.contact_person}`}
