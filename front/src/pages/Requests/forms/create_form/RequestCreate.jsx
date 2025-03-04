@@ -20,7 +20,7 @@ import './request_create.css'
 export default function RequestCreate() {
     const navigate = useNavigate()
     const { register, trigger, control, reset, handleSubmit, setValue, formState: { errors } } = useForm({ mode: 'onSubmit' })
-    const [clients, setClients] = useState(null)
+    const [clients, setClients] = useState([])
     const [open, setOpen] = useState(false);
     const [countries, setCountries] = useState([])
     const [cities, setCities] = useState([])
