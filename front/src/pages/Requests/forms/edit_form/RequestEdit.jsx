@@ -52,7 +52,6 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
             api(`/api/requests/${request.id}/`, 'PATCH', form_data)
                 .then((res) => {
                     setAlertInfo({ open: true, color: 'success', message: res.data.message })
-                    setLoader(true)
                 })
                 .catch((err) => {
                 })
@@ -148,14 +147,14 @@ export default function RequestEdit({ request, openDialog, setOpenDialog, point 
     const handleClose = () => {
         setOpenDialog(false);
         setCurrentReq(null)
+        setLoader(true)
     };
 
     return (
         <Grid container justifyContent='center'>
             <BootstrapDialog
-                className='dialog_container'
                 onClose={handleClose}
-                maxWidth={'1200px'}
+                fullScreen
                 aria-labelledby="customized-dialog-title"
                 open={openDialog}
             >

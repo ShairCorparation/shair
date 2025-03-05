@@ -61,7 +61,7 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
 
     function setDocValue(file) {
         setFiles(file);
-        if (file[0].type === 'application/pdf' || file[0].type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || files[0].type === 'image/png' || files[0].type === 'image/jpeg') {
+        if (file[0].type === 'application/pdf' || file[0].type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file[0].type === 'image/png' || file[0].type === 'image/jpeg') {
             setValue('file', file[0].file)
             clearErrors('file')
         }
@@ -124,16 +124,13 @@ export default function DocForm({ doc_dialog, setDocDialog, curr_req, setAlertIn
                                             render={() => (
                                                 <Dropzone header={false} footer={false} preview={true}
                                                     onChange={(e) => setDocValue(e)}
-
+                                                    maxFiles={1}
                                                     label={<SaveAltIcon fontSize='xxx-large' />}
                                                 >
-
-
                                                     {files.length > 0 &&
                                                         files.map((file) => (
                                                             <FileItem {...file} onDelete={removeFile} key={file.id} info />
                                                         ))}
-
                                                 </Dropzone>
                                             )}
                                         />

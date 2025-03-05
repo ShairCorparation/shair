@@ -108,7 +108,7 @@ class RequestViewSet(
         instance = get_object_or_404(Request, pk=pk)
         instance.receive_doc_date = dt.datetime.now()
         instance.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response(data={'receive_doc_date': instance.receive_doc_date}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
     def get_fines(self, request, *args, **kwargs):

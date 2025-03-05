@@ -71,10 +71,10 @@ export default function Orders() {
             params: {
                 ...filterData,
                 'ordering': ordering ? ordering : `${order === 'desc' ? '-' : ''}${orderBy}`,
-                page: page_size ? page_size : 1
+                page: page_size ? page_size : page
             }
         }).then((res) => {
-            setPage(page_size ? page_size : 1)
+            setPage(page_size ? page_size : page)
             setCountPage(res.data.total_pages)
             setRequests(res.data.results)
         })
@@ -108,20 +108,22 @@ export default function Orders() {
 
     React.useEffect(() => {
         requests &&
-            get_projects()
+            get_projects(null, 1)
     }, [filterData])
 
     const clientPayment = (value, req_id) => {
         api(`/api/requests/${req_id}/`, 'PATCH', { payment_from_client: value }).then((res) => {
             setAlertInfo({ open: true, color: 'success', message: value ? 'Статус оплаты от клиента установлен!' : 'Статус оплаты от клиента снят!' })
-            setLoader(true)
+            let reqInd = requests.findIndex(el => el.id === req_id)
+            requests[reqInd].payment_from_client = value
         })
     }
 
     const carrierPayment = (value, req_id) => {
         api(`/api/requests/${req_id}/`, 'PATCH', { payment_from_carrier: value }).then((res) => {
             setAlertInfo({ open: true, color: 'success', message: value ? 'Статус оплаты перевозчику установлен!' : 'Статус оплаты перевозчику снят!' })
-            setLoader(true)
+            let reqInd = requests.findIndex(el => el.id === req_id)
+            requests[reqInd].payment_from_carrier = value
         })
     }
 
@@ -145,10 +147,11 @@ export default function Orders() {
     }
 
     const set_receive_doc = () => {
-        api(`/api/requests/${curr_req.id}/set_receive_doc_date/`, 'PATCH').then(() => {
+        api(`/api/requests/${curr_req.id}/set_receive_doc_date/`, 'PATCH').then((res) => {
             setReceiveDoc(false)
             setAlertInfo({ open: true, color: 'success', message: 'Статус получения документов установлен!' })
-            setLoader(true)
+            let reqInd = requests.findIndex(el => el.id === curr_req.id)
+            requests[reqInd].receive_doc_date = res.data?.receive_doc_date
         })
     }
 

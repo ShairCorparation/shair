@@ -28,11 +28,16 @@ export default function DeleteRequest({ setOpen, open, currentReq, setLoader, se
                 })
         }
         else {
-            api(`/api/requests/${currentReq.id}/`, 'PATCH', data).then((res) => {
-                setAlertInfo({ open: open, color: 'secondary', message: 'Запрос был помещен в архив!' })
-                setLoader(true)
-                setOpen(false)
-            })
+            if (currentReq.payment_from_carrier && currentReq.payment_from_client) {
+                api(`/api/requests/${currentReq.id}/`, 'PATCH', data).then((res) => {
+                    setAlertInfo({ open: open, color: 'secondary', message: 'Запрос был помещен в архив!' })
+                    setLoader(true)
+                    setOpen(false)
+                })
+            }
+            else {
+                setAlertInfo({ open: open, color: 'error', message: 'Не проведена оплата по клиенту или перевозчику!' })
+            }
         }
     }
 

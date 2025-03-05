@@ -26,7 +26,3 @@
     display: flex;
     justify-content: center;
 }
-
-.dialog_container > div:nth-child(3) > div:first-child {
-    min-width: fit-content !important;
-}

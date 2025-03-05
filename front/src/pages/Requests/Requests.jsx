@@ -43,10 +43,10 @@ export default function Requests({ setAlertInfo }) {
         await api(`/api/requests/`, 'GET', {}, false, {
             params: {
                 ...filterData,
-                page: page_size ? page_size : 1
+                page: page_size ? page_size : page
             }
         }).then((res) => {
-            setPage(page_size ? page_size : 1)
+            setPage(page_size ? page_size : page)
             setCountPage(res.data.total_pages)
             setRequests(res.data.results)
             setRequestLoad(false)
@@ -70,7 +70,7 @@ export default function Requests({ setAlertInfo }) {
 
     React.useEffect(() => {
         requests &&
-            fetch_requests()
+            fetch_requests(1)
     }, [filterData])
 
     React.useEffect(() => {
