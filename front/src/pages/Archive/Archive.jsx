@@ -18,6 +18,18 @@ import Loader from '../components/Loader';
 import { useEffect } from 'react'
 import { api } from '../../api/api'
 
+
+const headCells = [
+    { id: 'date_of_shipment', label: 'Дата загрузки', sort: true },
+    { id: 'date_of_delivery', label: 'Дата доставки', sort: true },
+    { id: 'client__company_name', label: 'Клиент', sort: true },
+    { id: 'info', label: 'Инфо о грузе' },
+    { id: 'country_of_dispatch', label: 'Маршруты' },
+    { id: 'customer_price', label: 'Фрахт' },
+    { id: 'benefit', label: 'Прибыль' },
+    { id: 'carrier__company_name', label: 'Перевозчик', sort: true },
+]
+
 export default function Archive() {
     const [loader, setLoader] = React.useState(true)
     const [alertInfo, setAlertInfo] = React.useState({ open: false, color: '', message: '' });
@@ -110,22 +122,24 @@ export default function Archive() {
                     <Table size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Дата загрузки</TableCell>
-                                <TableCell align="left">Дата доставки</TableCell>
-                                <TableCell align="left">
-                                    <TableSortLabel
-                                        active={orderBy === 'client'}
-                                        direction={orderBy === 'client' ? order : 'asc'}
-                                        onClick={() => handleRequestSort('client')}>
-                                        Клиент
-                                    </TableSortLabel>
-                                </TableCell>
-                                <TableCell align="left">Инфо о грузе</TableCell>
-                                <TableCell align="left">Маршруты</TableCell>
-                                <TableCell align="left">Фрахт</TableCell>
-                                <TableCell align="left">Прибыль</TableCell>
-                                <TableCell align="left">Перевозчик</TableCell>
-                                <TableCell align="left"></TableCell>
+
+
+
+                                {headCells.map(el => (
+                                    <TableCell>
+                                        {el.sort
+                                            ? <TableSortLabel
+                                                key={el.id}
+                                                active={orderBy === el.id}
+                                                direction={orderBy === el.id ? order : 'asc'}
+                                                onClick={() => handleRequestSort(el.id)}>
+                                                {el.label}
+                                            </TableSortLabel>
+                                            : el.label
+                                        }
+                                    </TableCell>
+
+                                ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>

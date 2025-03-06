@@ -23,12 +23,12 @@ import './orders.css'
 const headCells = [
     { id: 'date_of_shipment', label: 'Дата загрузки', sort: true },
     { id: 'date_of_delivery', label: 'Дата доставки', sort: true },
-    { id: 'client', label: 'Клиент', sort: true },
+    { id: 'client__company_name', label: 'Клиент', sort: true },
     { id: 'info', label: 'Инфо о грузе' },
     { id: 'country_of_dispatch', label: 'Маршруты' },
     { id: 'customer_price', label: 'Фрахт' },
     { id: 'benefit', label: 'Прибыль' },
-    { id: 'carrier', label: 'Перевозчик', sort: true },
+    { id: 'carrier__company_name', label: 'Перевозчик', sort: true },
 ]
 
 export default function Orders() {
