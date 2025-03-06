@@ -15,8 +15,6 @@ export default function DeleteRequest({ setOpen, open, currentReq, setLoader, se
     };
 
     const handleSave = () => {
-        const data = { status: 'archived', }
-        if (point === '') {
             api(`/api/requests/${currentReq.id}/`, 'DELETE')
                 .then((res) => {
                     setAlertInfo({ open: open, color: 'secondary', message: res.data.message })
@@ -26,19 +24,6 @@ export default function DeleteRequest({ setOpen, open, currentReq, setLoader, se
                 .catch((err) => {
                     setAlertInfo({ open: open, color: 'error', message: err.response.data.unp[0] })
                 })
-        }
-        else {
-            if (currentReq.payment_from_carrier && currentReq.payment_from_client) {
-                api(`/api/requests/${currentReq.id}/`, 'PATCH', data).then((res) => {
-                    setAlertInfo({ open: open, color: 'secondary', message: 'Запрос был помещен в архив!' })
-                    setLoader(true)
-                    setOpen(false)
-                })
-            }
-            else {
-                setAlertInfo({ open: open, color: 'error', message: 'Не проведена оплата по клиенту или перевозчику!' })
-            }
-        }
     }
 
 

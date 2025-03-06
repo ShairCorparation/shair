@@ -28,7 +28,6 @@ export default function Overcomes() {
     const [countPage, setCountPage] = useState(0)
     const [requestLoading, setRequestLoading] = useState(true)
 
-
     const get_overcomes = async (page_size=null) => {
         await api('/api/requests/get_overcomes/', 'GET', {}, false,
             {
@@ -51,7 +50,7 @@ export default function Overcomes() {
 
     useEffect(() => {
         content &&
-            get_overcomes()
+            get_overcomes(1)
     }, [sendFilter, selector])
 
 

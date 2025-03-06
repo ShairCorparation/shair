@@ -12,7 +12,7 @@ class ClientSerializer(serializers.ModelSerializer):
     count_request = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(client=instance.pk, status__in=['on it', 'complete', 'archived']).count()
+        return Request.objects.filter(client=instance.pk, status__in=['on it', 'complete']).count()
 
     class Meta:
         model = Client
@@ -23,7 +23,7 @@ class CarrierSerializer(serializers.ModelSerializer):
     count_request = serializers.SerializerMethodField()
 
     def get_count_request(self, instance):
-        return Request.objects.filter(status__in=['on it', 'complete', 'archived']).filter(carrier__carrier_id=instance.pk).count()
+        return Request.objects.filter(status__in=['on it', 'complete']).filter(carrier__carrier_id=instance.pk).count()
 
     class Meta:
         model = Carrier

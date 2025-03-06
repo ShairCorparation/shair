@@ -84,7 +84,7 @@ class RequestViewSet(
     @action(detail=False, methods=['GET'])
     def on_it(self, request, *args, **kwargs):
         archive = request.query_params.get('include_archive')
-        req_status = ['on it', 'archived'] if archive == 'true' else ['on it']
+        req_status = ['on it', 'complete'] if archive == 'true' else ['on it']
         instances = self.get_queryset().filter(status__in=req_status).order_by(self.request.query_params.get('ordering', self.ordering))
         page = self.paginate_queryset(instances)
         serializer = serializers.OrdersSerializer(page, many=True)
@@ -92,13 +92,13 @@ class RequestViewSet(
     
     @action(detail=False, methods=['GET'])
     def view_request_by_carrier_or_client(self, request, *args, **kwargs):
-        instances = self.get_queryset().filter(status__in=['on it', 'complete', 'archived']).order_by(self.request.query_params.get('ordering', self.ordering))
+        instances = self.get_queryset().filter(status__in=['on it', 'complete']).order_by(self.request.query_params.get('ordering', self.ordering))
         serializer = serializers.OrdersSerializer(instances, many=True) 
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['GET'])
     def archived(self, request, *args, **kwargs):
-        instances = self.get_queryset().filter(status__in=['complete', 'archived']).order_by(self.request.query_params.get('ordering', self.ordering))
+        instances = self.get_queryset().filter(status__in=['complete']).order_by(self.request.query_params.get('ordering', self.ordering))
         page = self.paginate_queryset(instances)
         serializer = serializers.OrdersSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -135,7 +135,7 @@ class RequestViewSet(
     def get_overcomes(self, request, *args, **kwargs):
         switcher = request.query_params.get('switcher')
         archive = request.query_params.get('include_archive')
-        req_status = ['on it', 'archived'] if archive == 'true' else ['on it']
+        req_status = ['on it', 'complete'] if archive == 'true' else ['on it']
         queryset = self.get_queryset().filter(status__in=req_status).values('executor' if switcher == 'executor' else 'client').\
             annotate(
                 count_req=Count('pk'),

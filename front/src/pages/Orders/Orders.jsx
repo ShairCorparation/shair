@@ -138,7 +138,8 @@ export default function Orders() {
         if (curr_req.payment_from_carrier && curr_req.payment_from_client) {
             api(`/api/requests/${curr_req.id}/`, 'PATCH', { status: 'complete' }).then(() => {
                 setCompleteDialog(false)
-                setLoader(true)
+                let reqInd = requests.findIndex(el => el.id === curr_req.id)
+                delete requests[reqInd]
             })
         }
         else {
@@ -236,7 +237,7 @@ export default function Orders() {
                                         <br />
                                         {req.carrier.contact_info}
                                     </TableCell>
-                                    <TableCell align='center'>
+                                    <TableCell align='center' sx={{minWidth: '160px'}}>
 
                                         <Button variant='contained' color='primary'
                                             onClick={() => {
@@ -284,7 +285,7 @@ export default function Orders() {
                                             </IconButton>
                                         </Tooltip>
 
-                                        <Tooltip title="Поместить в архив">
+                                        <Tooltip title="Удалить">
                                             <IconButton aria-label="delete"
                                                 onClick={() => {
                                                     setDeleteRequest(true)
