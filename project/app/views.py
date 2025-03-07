@@ -164,7 +164,7 @@ class RequestViewSet(
                 sum_usd=Sum('carrier__carrier_rate', filter=Q(carrier__carrier_currency='USD')),
                 sum_rub=Sum('carrier__carrier_rate', filter=Q(carrier__carrier_currency='RUB')),
                 sum_byn=Sum('carrier__carrier_rate', filter=Q(carrier__carrier_currency='BYN'))
-            ).order_by('-carrier')
+            ).order_by('-carrier__carrier_id__company_name')
         page = self.paginate_queryset(queryset)
         serializer = report_serializers.ConsumptionRequestSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)

@@ -28,7 +28,7 @@ const headCells = [
     { id: 'country_of_dispatch', label: 'Маршруты' },
     { id: 'customer_price', label: 'Фрахт' },
     { id: 'benefit', label: 'Прибыль' },
-    { id: 'carrier__company_name', label: 'Перевозчик', sort: true },
+    { id: 'carrier__carrier_id__company_name', label: 'Перевозчик', sort: true },
 ]
 
 export default function Orders() {

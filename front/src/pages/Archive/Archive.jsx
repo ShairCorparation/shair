@@ -27,7 +27,7 @@ const headCells = [
     { id: 'country_of_dispatch', label: 'Маршруты' },
     { id: 'customer_price', label: 'Фрахт' },
     { id: 'benefit', label: 'Прибыль' },
-    { id: 'carrier__company_name', label: 'Перевозчик', sort: true },
+    { id: 'carrier__carrier_id__company_name', label: 'Перевозчик', sort: true },
 ]
 
 export default function Archive() {
@@ -112,19 +112,14 @@ export default function Archive() {
         loader ? <Loader />
             : <React.Fragment>
 
-                {userInfo?.is_staff &&
-                    <Grid container xs={12} p={2} justifyContent={'center'}>
-                        <ExecutorFilter filterData={filterData} setFilterData={setFilterData} />
-                    </Grid>
-                }
+                <Grid container xs={12} p={2} justifyContent={'center'}>
+                    <ExecutorFilter filterData={filterData} setFilterData={setFilterData} />
+                </Grid>
 
                 <TableContainer component={Paper}>
                     <Table size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow>
-
-
-
                                 {headCells.map(el => (
                                     <TableCell>
                                         {el.sort
