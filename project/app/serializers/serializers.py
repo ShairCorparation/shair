@@ -78,7 +78,8 @@ class RequestSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
 
         representation['client'] = ClientSerializer(instance.client).data
-        representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
+        representation['date_of_shipment'] = instance.date_of_shipment.strftime("%Y-%m-%d")
+        representation['date_of_delivery'] = instance.date_of_delivery.strftime("%Y-%m-%d")
         return representation
     
     class Meta:
@@ -103,6 +104,8 @@ class RequestListSerializer(serializers.ModelSerializer):
             representation['customer_price'] = round(instance.customer_price * self.context[instance.currency], 2)
         representation['client'] = ClientSerializer(instance.client).data
         representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
+        representation['date_of_shipment'] = instance.date_of_shipment.strftime("%Y-%m-%d")
+        representation['date_of_delivery'] = instance.date_of_delivery.strftime("%Y-%m-%d")
         return representation
 
     class Meta:
@@ -131,6 +134,8 @@ class OrdersSerializer(serializers.ModelSerializer):
         representation['carrier'] = RequestCarriersSerializer(instance.carrier).data
         representation['executor'] = CustomUserSerializer(instance.executor).data
         representation['date_of_request'] = instance.date_of_request.strftime("%Y-%m-%d")
+        representation['date_of_shipment'] = instance.date_of_shipment.strftime("%Y-%m-%d")
+        representation['date_of_delivery'] = instance.date_of_delivery.strftime("%Y-%m-%d")
         return representation
 
     class Meta:
