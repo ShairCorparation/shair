@@ -70,7 +70,10 @@ export default function Carriers() {
             params: {
                 'carrier_id': id
             }
-        }).then(res => setDialogData(res.data.results))
+        }).then(res => {
+            setDialogData(res.data)
+            setOpenDialog(true)
+        })
     }
 
     const handleChangePage = (e, v) => {
@@ -116,7 +119,6 @@ export default function Carriers() {
                                             <TableCell align="left">
                                                 <Button sx={{ textTransform: 'capitalize' }} onClick={() => {
                                                     get_dialog_data(carrier.id)
-                                                    setOpenDialog(true)
                                                 }}>{carrier.contact_person}</Button>
                                             </TableCell>
                                             <TableCell align="left">{carrier.unp}</TableCell>
